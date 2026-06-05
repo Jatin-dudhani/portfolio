@@ -37,6 +37,9 @@ dev-server.*.log
 # vercel
 .vercel
 
+# pre-compiled tailwind
+app/.tailwind/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

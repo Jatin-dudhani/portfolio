@@ -1,102 +1,51 @@
-# Jatin Dudhani Portfolio
+# Jatin Dudhani — Portfolio
 
-A modern personal portfolio website built by **Jatin Dudhani** to showcase projects, skills, contact links, and full-stack development experience.
+Personal portfolio built with Next.js, TypeScript, Tailwind CSS v4, and motion.
 
-## Overview
+## Stack
 
-This portfolio is designed as a clean, responsive, and production-ready web presence. It includes a polished landing section, about section, skill categories, featured projects, and a working contact form.
-
-## Built With
-
-- Next.js
-- React
+- Next.js 16 (App Router)
 - TypeScript
-- Tailwind CSS
-- FormSubmit for contact form handling
-- Vercel for deployment
-- Git and GitHub for version control
+- Tailwind CSS v4
+- motion (Framer Motion v12)
+- next-themes (dark/light mode)
+- Zod + Resend (contact form)
+- Vitest (tests)
 
 ## Features
 
-- Responsive modern UI for desktop and mobile
-- Fixed glass-style navigation
-- Project cards with technology tags
-- Contact cards for GitHub, LinkedIn, and email
-- Working contact form that sends messages to email
-- Production build ready for Vercel
+- Dark/light theme toggle (persisted)
+- Interactive CLI terminal in the hero section with 16 commands
+- Mario easter egg in the terminal
+- Scroll-reveal animations
+- Contact form with server-side validation and email delivery
+- SEO metadata, sitemap, robots.txt
 
 ## Getting Started
 
-Install dependencies:
-
 ```bash
 npm install
-```
-
-Run the development server:
-
-```bash
 npm run dev
 ```
 
-Open:
+## Scripts
 
-```text
-http://localhost:3000
-```
-
-## Available Scripts
-
-```bash
-npm run dev
-```
-
-Starts the local development server.
-
-```bash
-npm run build
-```
-
-Creates a production build.
-
-```bash
-npm run start
-```
-
-Starts the production server after building.
-
-```bash
-npm run lint
-```
-
-Runs ESLint checks.
-
-## Contact Form
-
-The contact form uses FormSubmit and sends messages to:
-
-```text
-jatindudhani07@gmail.com
-```
-
-The first form submission may require email confirmation from FormSubmit.
+| Script | Purpose |
+|--------|---------|
+| `npm run dev` | Start dev server (Turbopack) |
+| `npm run build` | Production build |
+| `npm run start` | Start production server |
+| `npm run lint` | ESLint check |
+| `npm run test` | Run Vitest tests |
 
 ## Deployment
 
-This project is ready to deploy on Vercel.
-
-Recommended Vercel settings:
-
-- Framework Preset: Next.js
-- Build Command: `npm run build`
-- Install Command: `npm install`
-- Output Directory: default
-- Environment Variables: none required
+Deploy on Vercel. Set `RESEND_API_KEY` in environment variables for contact form email delivery (optional — form works without it, logs to console).
 
 ## Author
 
 **Jatin Dudhani**
 
-- GitHub: [Jatin-dudhani](https://github.com/Jatin-dudhani)
+- GitHub: [@Jatin-dudhani](https://github.com/Jatin-dudhani)
 - LinkedIn: [jatin-dudhani](https://www.linkedin.com/in/jatin-dudhani-057664254/)
 - Email: [jatindudhani07@gmail.com](mailto:jatindudhani07@gmail.com)
