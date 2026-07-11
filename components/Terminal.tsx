@@ -11,6 +11,8 @@ const commands: Record<string, string> = {
   help: `about        - who I am
 skills       - technical skills
 projects     - what I built
+blog         - technical writing
+activity     - recent GitHub commits
 experience   - work & leadership
 education    - academic background
 certificates - NPTEL certs
@@ -56,6 +58,16 @@ Aaveg Dramatic Club       Street plays for social awareness`,
   certificates: `Cloud Computing                          NPTEL (Jan-Apr 2026) — 74.65%
 Privacy & Security in Online Social Media NPTEL (Jul-Oct 2025) — 75.58%`,
 
+  blog: `technical writing about projects I built:
+
+  dpi-engine-cpp    Building a DPI Engine in C++17
+                    PCAP parsing, SNI extraction, 25+ app classification
+  rag-document-qa   RAG Pipelines with Vector Search
+                    Chunking, embeddings, retrieval, LLM-powered answers`,
+
+  activity: `Fetching latest commits from GitHub...
+  Try scrolling to the #activity section on the page.`,
+
   contact: `email     jatindudhani07@gmail.com
 github    github.com/Jatin-dudhani
 linkedin  linkedin.com/in/jatin-dudhani
@@ -65,7 +77,7 @@ phone     +91-8875843487`,
 
   banner,
 
-  ls: `about/  skills/  projects/  experience/  education/  certificates/  contact/`,
+  ls: `about/  skills/  projects/  blog/  activity/  experience/  education/  certificates/  contact/`,
 
   neofetch: `OS       Linux mind x86_64
 shell    bash / zsh

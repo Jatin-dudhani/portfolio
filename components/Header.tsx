@@ -7,7 +7,7 @@ import ThemeToggle from './ThemeToggle'
 
 export default function Header() {
   const [isOpen, setIsOpen] = useState(false)
-  const links = ['about', 'skills', 'experience', 'projects', 'contact']
+  const links = ['about', 'skills', 'experience', 'projects', 'blog', 'contact']
 
   const scrollTo = (id: string) => {
     setIsOpen(false)

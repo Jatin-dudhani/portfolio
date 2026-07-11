@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'motion/react'
 import { projects } from '@/lib/projects'
+import ProjectScreenshot from './ProjectScreenshot'
 
 const spring = { type: 'spring' as const, stiffness: 240, damping: 23 }
 
@@ -63,6 +64,8 @@ export default function Projects() {
 
               <h3 className="text-base font-bold text-[var(--foreground)]">{project.title}</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{project.description}</p>
+
+              {project.deployed && <ProjectScreenshot url={project.deployed} title={project.title} />}
 
               {project.preview && (
                 <div className="mt-4 rounded border border-[var(--card-border)] bg-[var(--background)]/40 p-2.5 font-mono text-[11px] leading-5 overflow-x-auto">
