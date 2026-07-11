@@ -1,113 +1,143 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { useState, useEffect } from 'react'
+import { motion, useScroll, useTransform } from 'motion/react'
 import TerminalWidget from './Terminal'
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: { staggerChildren: 0.15 },
-  },
-}
+const TYPING_SPEED = 35
+const WORDS = ['Systems', 'Full-Stack', 'AI/LLM', 'DevOps']
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' as const } },
-}
-
-const statVariants = {
-  hidden: { opacity: 0, scale: 0.8 },
-  visible: (i: number) => ({
-    opacity: 1,
-    scale: 1,
-    transition: { delay: 0.8 + i * 0.15, duration: 0.5, ease: 'easeOut' as const },
-  }),
-}
+const spring = { type: 'spring' as const, stiffness: 220, damping: 22 }
 
 export default function Hero() {
+  const [wordIdx, setWordIdx] = useState(0)
+  const [charIdx, setCharIdx] = useState(0)
+  const [deleting, setDeleting] = useState(false)
+  const [display, setDisplay] = useState('')
+
+  const { scrollY } = useScroll()
+  const parallaxY = useTransform(scrollY, [0, 600], [0, -80])
+  const fadeOut = useTransform(scrollY, [0, 500], [1, 0.6])
+
+  useEffect(() => {
+    const current = WORDS[wordIdx]
+    let timeout: ReturnType<typeof setTimeout>
+
+    if (!deleting && charIdx < current.length) {
+      timeout = setTimeout(() => {
+        setDisplay(current.slice(0, charIdx + 1))
+        setCharIdx((c) => c + 1)
+      }, TYPING_SPEED)
+    } else if (!deleting && charIdx === current.length) {
+      timeout = setTimeout(() => setDeleting(true), 1600)
+    } else if (deleting && charIdx > 0) {
+      timeout = setTimeout(() => {
+        setDisplay(current.slice(0, charIdx - 1))
+        setCharIdx((c) => c - 1)
+      }, TYPING_SPEED / 2)
+    } else if (deleting && charIdx === 0) {
+      setDeleting(false)
+      setWordIdx((i) => (i + 1) % WORDS.length)
+    }
+
+    return () => clearTimeout(timeout)
+  }, [charIdx, deleting, wordIdx])
+
+  const container = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.08 } },
+  }
+
+  const item = {
+    hidden: { opacity: 0, y: 18 },
+    visible: { opacity: 1, y: 0, transition: spring },
+  }
+
   return (
     <motion.section
       className="relative min-h-screen overflow-hidden pt-24 text-[var(--foreground)]"
       initial="hidden"
       animate="visible"
-      variants={containerVariants}
+      variants={container}
+      style={{ opacity: fadeOut }}
     >
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid min-h-[calc(100vh-6rem)] items-center gap-12 py-16 lg:grid-cols-[1.05fr_0.95fr]">
+      <motion.div
+        className="absolute inset-0 z-0 opacity-[0.04] pointer-events-none"
+        style={{ y: parallaxY }}
+      >
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 25% 25%, var(--green) 0%, transparent 50%),
+                           radial-gradient(circle at 75% 75%, var(--amber) 0%, transparent 50%)`,
+        }} />
+      </motion.div>
+
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 grid min-h-[calc(100vh-6rem)] items-center gap-10 py-16 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
-          <motion.div
-            variants={itemVariants}
-            className="mb-6 inline-flex items-center gap-3 rounded-lg border border-[#37ab8e]/35 bg-[#37ab8e]/10 px-4 py-2 text-sm font-medium text-[#9fe8d5]"
-          >
-            <span className="size-2 rounded-full bg-[#37ab8e] shadow-[0_0_16px_rgba(55,171,142,0.9)]" />
-            Full-stack developer building usable systems
+          <motion.div variants={item} className="mb-4">
+            <span className="font-mono text-sm text-[var(--green)]">
+              $ <span className="text-[var(--muted)]">cat</span> /home/jatin/README.md
+            </span>
           </motion.div>
 
-          <motion.h1
-            variants={itemVariants}
-            className="max-w-4xl text-5xl font-black leading-[1.02] sm:text-6xl lg:text-7xl"
-          >
-            <span className="text-[var(--foreground)]">Jatin Dudhani</span>
+          <motion.h1 variants={item} className="font-mono text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+            <span className="text-[var(--foreground)]">jatin-dudhani</span>
+            <br />
+            <span className="text-[var(--muted)] text-xl sm:text-2xl lg:text-3xl">@portfolio:~$</span>
           </motion.h1>
 
-          <motion.p
-            variants={itemVariants}
-            className="mt-6 max-w-2xl text-xl leading-8 text-[var(--muted)] sm:text-2xl"
-          >
-            Computer Science student focused on full-stack web apps, system design, and clean product experiences.
+          <motion.p variants={item} className="mt-4 text-base leading-7 text-[var(--muted)] font-mono sm:text-lg">
+            <span className="text-[var(--amber)]">Full-Stack Developer</span> &bull; CS undergrad @ LNMIIT Jaipur
           </motion.p>
 
-          <motion.p
-            variants={itemVariants}
-            className="mt-5 max-w-2xl text-base leading-7 text-[var(--muted)] sm:text-lg"
-          >
-            I build scalable interfaces with React, TypeScript, Node.js, and cloud-minded architecture, then polish the details so the result feels fast, clear, and dependable.
+          <motion.div variants={item} className="mt-3 font-mono text-lg sm:text-xl">
+            <span className="text-[var(--muted)]">Building </span>
+            <span className="text-[var(--green-bright)] font-bold">
+              {display}<span className="animate-blink text-[var(--green)]">_</span>
+            </span>
+          </motion.div>
+
+          <motion.p variants={item} className="mt-4 max-w-xl text-sm leading-6 text-[var(--muted)] font-mono">
+            React &bull; Next.js &bull; TypeScript &bull; Node.js &bull; C++ &bull; AI/LLM &bull; Docker
           </motion.p>
 
-          <motion.div
-            variants={itemVariants}
-            className="mt-9 flex flex-col gap-3 sm:flex-row"
-          >
+          <motion.div variants={item} className="mt-8 flex flex-col gap-3 sm:flex-row font-mono text-sm">
             <a
               href="#projects"
-              className="rounded-lg bg-[#f2a65a] px-6 py-3 text-center text-sm font-bold text-[#111418] shadow-[0_18px_40px_rgba(242,166,90,0.22)] transition hover:-translate-y-0.5 hover:bg-[#ffbd79]"
+              className="inline-flex items-center gap-2 rounded border border-[var(--green)] bg-[var(--green)]/10 px-5 py-2.5 font-semibold text-[var(--green)] transition-all duration-200 hover:bg-[var(--green)] hover:text-[var(--background)] hover:shadow-[0_0_20px_rgba(63,185,80,0.3)]"
             >
-              View My Work
+              $ ls projects/
+            </a>
+            <a
+              href="#experience"
+              className="rounded border border-[var(--card-border)] px-5 py-2.5 font-semibold text-[var(--muted)] transition-all duration-200 hover:border-[var(--amber)] hover:text-[var(--amber)]"
+            >
+              $ cat experience
             </a>
             <a
               href="#contact"
-              className="rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] px-6 py-3 text-center text-sm font-bold text-[var(--foreground)] transition hover:-translate-y-0.5 hover:border-[#37ab8e]/60 hover:bg-[#37ab8e]/12"
+              className="rounded border border-[var(--card-border)] px-5 py-2.5 font-semibold text-[var(--muted)] transition-all duration-200 hover:border-[var(--green)] hover:text-[var(--green)]"
             >
-              Get In Touch
+              $ mail jatin
             </a>
           </motion.div>
 
-          <motion.dl
-            variants={itemVariants}
-            className="mt-12 grid max-w-xl grid-cols-3 gap-3"
-          >
+          <motion.div variants={item} className="mt-10 flex flex-wrap gap-x-6 gap-y-3 font-mono text-xs text-[var(--muted)]">
             {[
-              ['4th', 'Year CS'],
-              ['10+', 'Core Skills'],
-              ['7', 'Projects'],
-            ].map(([value, label], i) => (
-              <motion.div
-                key={label}
-                custom={i}
-                variants={statVariants}
-                className="rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-4"
-              >
-                <dt className="text-2xl font-black text-[var(--foreground)]">{value}</dt>
-                <dd className="mt-1 text-xs font-medium uppercase text-[var(--muted)]">{label}</dd>
-              </motion.div>
+              { label: 'C++', desc: 'DPI / Networking' },
+              { label: 'React/Next.js', desc: 'Full-stack Apps' },
+              { label: 'Node.js', desc: 'REST APIs' },
+              { label: 'AI/LLM', desc: 'RAG / AI SDK' },
+              { label: 'Docker', desc: 'CI/CD & Cloud' },
+            ].map(({ label, desc }) => (
+              <div key={label} className="flex flex-col gap-0.5">
+                <span className="text-[var(--green)] font-semibold">{label}</span>
+                <span className="text-[var(--muted)]">{desc}</span>
+              </div>
             ))}
-          </motion.dl>
+          </motion.div>
         </div>
 
-        <motion.div
-          variants={itemVariants}
-          className="relative"
-        >
+        <motion.div variants={item} className="relative w-full max-w-lg mx-auto lg:mx-0">
           <TerminalWidget />
         </motion.div>
       </div>

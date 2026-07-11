@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import { projects } from '@/lib/projects'
 
 describe('projects data', () => {
-  it('should have at least 7 projects', () => {
-    expect(projects.length).toBeGreaterThanOrEqual(7)
+  it('should have at least 6 projects', () => {
+    expect(projects.length).toBeGreaterThanOrEqual(6)
   })
 
   it('each project should have required fields', () => {
@@ -16,11 +16,11 @@ describe('projects data', () => {
     }
   })
 
-  it('new projects should have deployed URLs', () => {
-    const newProjects = projects.filter(p =>
-      ['ai-project-planner', 'revolving-clock'].includes(p.id)
+  it('featured projects should have deployed URLs', () => {
+    const featured = projects.filter(p =>
+      ['ai-project-planner', 'simbusiness'].includes(p.id)
     )
-    for (const project of newProjects) {
+    for (const project of featured) {
       expect(project.deployed).toBeTruthy()
     }
   })

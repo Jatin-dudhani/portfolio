@@ -1,63 +1,89 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { motion, useScroll, useTransform } from 'motion/react'
+
+const spring = { type: 'spring' as const, stiffness: 280, damping: 26 }
+
+const skillCategories = [
+  {
+    category: 'Languages',
+    skills: ['JavaScript (ES6+)', 'TypeScript', 'HTML5', 'CSS3', 'C++', 'Python'],
+  },
+  {
+    category: 'Frontend',
+    skills: ['React.js', 'Next.js', 'Redux Toolkit', 'Tailwind CSS', 'Framer Motion', 'shadcn/ui', 'Vite'],
+  },
+  {
+    category: 'Backend',
+    skills: ['Node.js', 'Express.js', 'REST API Design', 'JWT Auth', 'MongoDB', 'MVC Architecture'],
+  },
+  {
+    category: 'AI & API Integration',
+    skills: ['AI SDK', 'OpenAI API', 'OpenRouter', 'LLM Integration', 'RAG', 'Vector Search', 'Zod', 'React Flow'],
+  },
+  {
+    category: 'DevOps & Cloud',
+    skills: ['Git', 'GitHub', 'Docker', 'Kubernetes', 'Firebase', 'Vercel', 'Render', 'CI/CD'],
+  },
+  {
+    category: 'Systems & Networking',
+    skills: ['C++', 'Multi-threading', 'TCP/IP', 'TLS/SSL', 'PCAP', 'DPI', 'Networking Protocols'],
+  },
+]
 
 export default function Skills() {
-  const skillCategories = [
-    {
-      category: 'Frontend',
-      skills: ['React', 'Next.js', 'TypeScript', 'Tailwind CSS', 'Framer Motion'],
-    },
-    {
-      category: 'Backend',
-      skills: ['Node.js', 'REST APIs', 'MongoDB'],
-    },
-    {
-      category: 'DevOps',
-      skills: ['Git', 'Docker', 'AWS', 'CI/CD'],
-    },
-    {
-      category: 'Craft',
-      skills: ['System Design', 'Full-Stack Architecture', 'AI Integration', 'UI Animation'],
-    },
-  ]
+  const { scrollY } = useScroll()
+  const y = useTransform(scrollY, [200, 1000], [0, -30])
 
   return (
     <motion.section
       id="skills"
-      className="py-24 text-[var(--foreground)]"
+      className="relative py-24 text-[var(--foreground)] font-mono overflow-hidden"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.5 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-          <div>
-            <p className="text-sm font-bold uppercase text-[#81dec8]">Stack</p>
-            <h2 className="mt-3 text-4xl font-black sm:text-5xl">Skills & Technologies</h2>
-          </div>
-          <p className="max-w-xl text-[var(--muted)]">
-            Technologies I actually use across my projects.
-          </p>
-        </div>
+      <motion.div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ y }}>
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 30% 50%, var(--green) 0%, transparent 50%)`,
+        }} />
+      </motion.div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={spring}
+        >
+          <p className="text-sm text-[var(--green)]">
+            $ <span className="text-[var(--muted)]">cat</span> /home/jatin/skills.json
+          </p>
+          <h2 className="mt-2 text-2xl font-bold text-[var(--foreground)]"># Technical Skills</h2>
+        </motion.div>
+
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {skillCategories.map((category, i) => (
             <motion.div
               key={category.category}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 16 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-60px' }}
-              transition={{ duration: 0.5, delay: i * 0.1, ease: 'easeOut' as const }}
-              className="rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-6 transition hover:-translate-y-1 hover:border-[#37ab8e]/45 hover:bg-[var(--card-bg)]"
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ ...spring, delay: i * 0.05 }}
+              whileHover={{ y: -2, transition: { duration: 0.15 } }}
+              className="rounded border border-[var(--card-border)] bg-[var(--card-bg)] p-4 transition-shadow hover:border-[var(--green)]/40 hover:shadow-[0_0_16px_rgba(63,185,80,0.06)]"
             >
-              <h3 className="text-2xl font-black text-[var(--foreground)]">{category.category}</h3>
-              <div className="mt-5 flex flex-wrap gap-2">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs text-[var(--green)]">[{i + 1}]</span>
+                <h3 className="text-xs font-bold text-[var(--foreground)] uppercase tracking-wider">{category.category}</h3>
+              </div>
+              <div className="flex flex-wrap gap-1.5">
                 {category.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="rounded-md border border-[var(--card-border)] bg-[var(--background)]/45 px-3 py-2 text-sm font-semibold text-[var(--muted)]"
+                    className="rounded px-2 py-1 text-[11px] font-medium border border-[var(--card-border)] text-[var(--muted)] bg-[var(--background)]/30 transition-all duration-150 hover:border-[var(--green)]/40 hover:text-[var(--green)] hover:bg-[var(--green)]/5"
                   >
                     {skill}
                   </span>

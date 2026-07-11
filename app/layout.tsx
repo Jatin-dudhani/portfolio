@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Jatin Dudhani - Full-Stack Web Developer",
-  description: "Portfolio of Jatin Dudhani, a full-stack web developer specializing in React, TypeScript, and Node.js.",
+  title: "Jatin Dudhani — Systems & Full-Stack Developer",
+  description: "Portfolio of Jatin Dudhani — CS undergrad building low-level systems (C++, DPI, networking) and full-stack apps (React, Next.js, Node.js).",
   icons: {
     icon: "/favicon.ico",
   },

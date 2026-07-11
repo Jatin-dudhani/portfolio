@@ -1,38 +1,47 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf9f6;
+  --background: #0a0d12;
+  --foreground: #c9d1d9;
+  --green: #3fb950;
+  --green-dim: #2ea043;
+  --green-bright: #56d364;
+  --amber: #d29922;
+  --amber-bright: #e3b341;
+  --red: #f85149;
+  --muted: #8b949e;
+  --card-bg: rgba(255,255,255,0.04);
+  --card-border: rgba(255,255,255,0.1);
+  --nav-bg: rgba(10,13,18,0.9);
+  --nav-border: rgba(255,255,255,0.08);
+}
+
+[data-theme="light"] {
+  --background: #f0f0f0;
   --foreground: #1a1a1a;
-  --card-bg: #ffffff;
-  --card-border: rgba(0,0,0,0.1);
-  --muted: rgba(0,0,0,0.6);
-  --accent: #37ab8e;
-  --nav-bg: rgba(255,255,255,0.8);
+  --green: #2ea043;
+  --green-dim: #1a7f37;
+  --green-bright: #3fb950;
+  --amber: #b8860b;
+  --amber-bright: #d29922;
+  --red: #cf222e;
+  --muted: #656d76;
+  --card-bg: rgba(0,0,0,0.03);
+  --card-border: rgba(0,0,0,0.12);
+  --nav-bg: rgba(240,240,240,0.9);
   --nav-border: rgba(0,0,0,0.08);
 }
 
-[data-theme="dark"] {
-  --background: #0e1116;
-  --foreground: #f4efe7;
-  --card-bg: rgba(255,255,255,0.055);
-  --card-border: rgba(255,255,255,0.1);
-  --muted: rgba(255,255,255,0.5);
-  --nav-bg: rgba(14,17,22,0.8);
-  --nav-border: rgba(255,255,255,0.1);
-}
+* { box-sizing: border-box; }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono', 'Fira Code', Menlo, monospace;
+  font-size: 0.9375rem;
+  line-height: 1.7;
 }
 
 body::before {
@@ -42,25 +51,81 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    linear-gradient(rgba(128,128,128,0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(128,128,128,0.035) 1px, transparent 1px),
-    radial-gradient(circle at 18% 12%, rgba(55, 171, 142, 0.12), transparent 28rem),
-    radial-gradient(circle at 85% 8%, rgba(238, 151, 85, 0.1), transparent 24rem),
-    linear-gradient(135deg, #faf9f6 0%, #e8f0ed 46%, #f5f3ef 100%);
-  background-size: 56px 56px, 56px 56px, auto, auto, auto;
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255,255,255,0.015) 2px,
+      rgba(255,255,255,0.015) 4px
+    );
+  background-size: 100% 4px;
 }
 
-[data-theme="dark"] body::before {
+[data-theme="light"] body::before {
   background:
-    linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px),
-    radial-gradient(circle at 18% 12%, rgba(55, 171, 142, 0.18), transparent 28rem),
-    radial-gradient(circle at 85% 8%, rgba(238, 151, 85, 0.16), transparent 24rem),
-    linear-gradient(135deg, #0e1116 0%, #141923 46%, #10151b 100%);
-  background-size: 56px 56px, 56px 56px, auto, auto, auto;
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.025) 2px,
+      rgba(0,0,0,0.025) 4px
+    );
+  background-size: 100% 4px;
 }
 
 ::selection {
-  background: #f2a65a;
-  color: #111418;
+  background: var(--green);
+  color: var(--background);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.6; }
+  50% { transform: translateY(-20px) scale(1.1); opacity: 1; }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 8px rgba(63,185,80,0.2); }
+  50% { box-shadow: 0 0 24px rgba(63,185,80,0.5); }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-blink {
+  animation: blink 1s step-end infinite;
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.6s ease-out forwards;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+/* particle dots */
+.particle {
+  position: fixed;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  background: var(--green);
+  opacity: 0.3;
+}
+
+@media (max-width: 640px) {
+  body { font-size: 0.875rem; }
 }

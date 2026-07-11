@@ -1,79 +1,97 @@
 'use client'
 
-import { motion } from 'motion/react'
+import { motion, useScroll, useTransform } from 'motion/react'
 import { projects } from '@/lib/projects'
 
+const spring = { type: 'spring' as const, stiffness: 240, damping: 23 }
+
 export default function Projects() {
+  const { scrollY } = useScroll()
+  const y = useTransform(scrollY, [800, 2200], [0, -30])
+
   return (
     <motion.section
       id="projects"
-      className="py-24 text-[var(--foreground)]"
+      className="relative py-24 text-[var(--foreground)] font-mono overflow-hidden"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.5 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.3 }}
     >
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-12 flex flex-col justify-between gap-4 md:flex-row md:items-end">
-          <div>
-            <p className="text-sm font-bold uppercase text-[#f2a65a]">Selected Work</p>
-            <h2 className="mt-3 text-4xl font-black sm:text-5xl">Featured Projects</h2>
-          </div>
-          <p className="max-w-xl text-[var(--muted)]">
-            What I have built, deployed, and learned from.
-          </p>
-        </div>
+      <motion.div className="absolute inset-0 opacity-[0.02] pointer-events-none" style={{ y }}>
+        <div className="absolute inset-0" style={{
+          backgroundImage: `radial-gradient(circle at 20% 60%, var(--green) 0%, transparent 50%)`,
+        }} />
+      </motion.div>
 
-        <div className="grid gap-5 md:grid-cols-2">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div
+          className="mb-8"
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={spring}
+        >
+          <p className="text-sm text-[var(--green)]">
+            $ <span className="text-[var(--muted)]">ls</span> -la /home/jatin/projects/
+          </p>
+          <h2 className="mt-2 text-2xl font-bold text-[var(--foreground)]"># Featured Projects</h2>
+        </motion.div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
           {projects.map((project, index) => (
             <motion.article
               key={project.id}
-              initial={{ opacity: 0, y: 50 }}
+              initial={{ opacity: 0, y: 18 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-50px' }}
-              transition={{ duration: 0.5, delay: index * 0.08, ease: 'easeOut' as const }}
-              className="group flex h-full flex-col rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-6 transition hover:-translate-y-1 hover:border-[#f2a65a]/50 hover:shadow-[0_22px_60px_rgba(0,0,0,0.28)]"
+              viewport={{ once: true, margin: '-40px' }}
+              transition={{ ...spring, delay: index * 0.06 }}
+              whileHover={{ y: -3, transition: { duration: 0.15 } }}
+              className="group flex h-full flex-col rounded border border-[var(--card-border)] bg-[var(--card-bg)] p-5 transition-shadow hover:border-[var(--green)]/50 hover:shadow-[0_0_24px_rgba(63,185,80,0.08)]"
             >
-              <div className="mb-6 flex items-start justify-between gap-4">
-                <div className="grid size-12 place-items-center rounded-lg bg-[#37ab8e]/13 text-sm font-black text-[#81dec8]">
+              <div className="mb-3 flex items-center gap-3">
+                <motion.span
+                  className="grid size-8 place-items-center rounded border border-[var(--green)]/30 bg-[var(--green)]/8 text-xs font-bold text-[var(--green)]"
+                  whileHover={{ rotate: [0, -8, 8, -4, 0], transition: { duration: 0.3 } }}
+                >
                   {String(index + 1).padStart(2, '0')}
-                </div>
-                <span className="rounded-md border border-[var(--card-border)] px-3 py-1 text-xs font-bold uppercase text-[var(--muted)]">
-                  Project
+                </motion.span>
+                <span className="text-[10px] uppercase tracking-widest text-[var(--muted)]">
+                  ./project
                 </span>
               </div>
 
-              <h3 className="text-2xl font-black text-[var(--foreground)]">{project.title}</h3>
-              <p className="mt-3 flex-1 leading-7 text-[var(--muted)]">{project.description}</p>
+              <h3 className="text-base font-bold text-[var(--foreground)]">{project.title}</h3>
+              <p className="mt-2 flex-1 text-sm leading-6 text-[var(--muted)]">{project.description}</p>
 
-              <div className="mt-6 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-1.5">
                 {project.technologies.map((tech) => (
                   <span
                     key={tech}
-                    className="rounded-md bg-[var(--foreground)]/6 px-3 py-1.5 text-xs font-semibold text-[var(--muted)]"
+                    className="rounded px-2 py-0.5 text-[11px] font-medium border border-[var(--card-border)] text-[var(--muted)] transition-all duration-150 group-hover:border-[var(--green)]/30 group-hover:text-[var(--green)]"
                   >
                     {tech}
                   </span>
                 ))}
               </div>
 
-              <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-5 flex flex-col gap-2 sm:flex-row text-xs">
                 <a
                   href={project.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex-1 rounded-lg bg-[var(--foreground)] px-4 py-3 text-center text-sm font-bold text-[var(--background)] transition hover:bg-[#f2a65a]"
+                  className="flex-1 rounded border border-[var(--green)] px-3 py-2 text-center font-semibold text-[var(--green)] transition-all duration-200 hover:bg-[var(--green)] hover:text-[var(--background)] hover:shadow-[0_0_14px_rgba(63,185,80,0.25)]"
                 >
-                  View GitHub
+                  $ gh repo view
                 </a>
                 {project.deployed && (
                   <a
                     href={project.deployed}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex-1 rounded-lg border border-[var(--card-border)] px-4 py-3 text-center text-sm font-bold text-[var(--foreground)] transition hover:border-[#37ab8e]/60 hover:bg-[#37ab8e]/12"
+                    className="flex-1 rounded border border-[var(--card-border)] px-3 py-2 text-center font-semibold text-[var(--muted)] transition-all duration-200 hover:border-[var(--amber)] hover:text-[var(--amber)] hover:shadow-[0_0_14px_rgba(210,153,34,0.15)]"
                   >
-                    Live Demo
+                    curl -L {project.deployed.replace(/https?:\/\//, '')}
                   </a>
                 )}
               </div>

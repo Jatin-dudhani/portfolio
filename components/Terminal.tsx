@@ -8,54 +8,70 @@ const banner = `╔════════════════════�
 ╚══════════════════════════════════╝`
 
 const commands: Record<string, string> = {
-  help: `about      - who I am
-skills     - what I know
-projects   - what I built
-contact    - how to reach me
-whoami     - display identity
-banner     - show banner
-ls         - list sections
-date       - current time
-neofetch   - dev system info
-dark       - dark mode
-light      - light mode
-mario      - watch me run
-clear      - clear terminal
-sudo       - try it ;)
-matrix     - follow the rabbit`,
+  help: `about        - who I am
+skills       - technical skills
+projects     - what I built
+experience   - work & leadership
+education    - academic background
+certificates - NPTEL certs
+contact      - how to reach me
+whoami       - display identity
+banner       - show banner
+ls           - list sections
+date         - current time
+neofetch     - dev system info
+dark         - dark mode
+light        - light mode
+mario        - watch me run
+clear        - clear terminal
+sudo         - try it ;)
+matrix       - follow the rabbit`,
 
-  about: `CS student at LNMIIT Jaipur.
-Building full-stack apps with React, Next.js, TypeScript.
-Exploring AI SDKs, distributed systems & DevOps.`,
+  about: `Full-Stack Developer | CS @ LNMIIT Jaipur
+Expertise: React, Next.js, TypeScript, Node.js, Express, MongoDB
+Building: DPI engines (C++), RAG pipelines (Python), AI apps (AI SDK)
+Exploring: distributed systems, LLM infra, developer tooling`,
 
-  skills: `frontend    React, Next.js, TypeScript, Tailwind, Framer Motion
-backend     Node.js, REST APIs, MongoDB
-devops      Git, Docker, AWS, CI/CD
-craft       System Design, Full Stack, AI Integration`,
+  skills: `languages    JavaScript(ES6+), TypeScript, HTML5, CSS3, C++, Python
+frontend     React, Next.js, Redux Toolkit, Tailwind, Framer Motion, shadcn/ui
+backend      Node.js, Express.js, REST APIs, JWT Auth, MongoDB, MVC
+ai/api       AI SDK, OpenAI, OpenRouter, LLM, RAG, Vector Search, Zod
+devops       Git, Docker, Kubernetes, Firebase, Vercel, Render, CI/CD
+systems      C++, Multi-threading, TCP/IP, TLS/SSL, PCAP, DPI`,
 
-  projects: `ai-project-planner    AI-powered project briefs (deployed)
-netflix-gpt           Netflix clone w/ AI recommendations
-revolving-clock       3D flip clock w/ MongoDB (deployed)
-simbusiness           Business simulation (system design)
-bulk-email-sender     Batch email w/ scheduling
-birthday-reminder     React-based birthday tracker
-devops-pipeline       Docker + AWS + GitLab CI/CD`,
+  projects: `dpi-engine           DPI packet analyzer in C++ (multi-threaded)
+ai-project-planner   AI-powered project briefs (deployed)
+rag-document-qa      RAG system for document Q&A (Python)
+simbusiness          Business simulation (system design)
+netflix-gpt          Netflix clone w/ AI recommendations
+devops-pipeline      Docker + AWS + GitLab CI/CD`,
+
+  experience: `TA Internet of Things    LNMIIT (Jan-Apr 2025)
+                         ~95% lab completion, -30% troubleshooting
+PR Head PLINTH Fest       Coordinated 1000+ participants
+Aaveg Dramatic Club       Street plays for social awareness`,
+
+  education: `B.Tech CSE    LNMIIT, Jaipur (May 2026) — CGPA: 6.5/10`,
+
+  certificates: `Cloud Computing                          NPTEL (Jan-Apr 2026) — 74.65%
+Privacy & Security in Online Social Media NPTEL (Jul-Oct 2025) — 75.58%`,
 
   contact: `email     jatindudhani07@gmail.com
 github    github.com/Jatin-dudhani
-linkedin  linkedin.com/in/jatin-dudhani`,
+linkedin  linkedin.com/in/jatin-dudhani
+phone     +91-8875843487`,
 
-  whoami: `jatin-dudhani — full-stack developer, CS undergrad.`,
+  whoami: `jatin-dudhani — Full-Stack Developer, CS undergrad @ LNMIIT`,
 
   banner,
 
-  ls: `about/  skills/  projects/  contact/`,
+  ls: `about/  skills/  projects/  experience/  education/  certificates/  contact/`,
 
   neofetch: `OS       Linux mind x86_64
 shell    bash / zsh
 editor   VS Code
-stack    Next.js + TypeScript + Tailwind
-status   building the next thing`,
+stack    React / Next.js / Node.js / TypeScript / C++ / Python
+status   open to SDE roles`,
 
   sudo: `Nice try, but there's no root here.`,
   su: `Just type 'help' to see commands.`,

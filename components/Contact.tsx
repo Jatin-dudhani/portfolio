@@ -3,6 +3,8 @@
 import { useState } from 'react'
 import { motion } from 'motion/react'
 
+const spring = { type: 'spring' as const, stiffness: 260, damping: 25 }
+
 const contactEmail = 'jatindudhani07@gmail.com'
 
 export default function Contact() {
@@ -47,66 +49,88 @@ export default function Contact() {
       label: 'GitHub',
       value: 'github.com/Jatin-dudhani',
       href: 'https://github.com/Jatin-dudhani',
-      mark: 'GH',
+      cmd: 'gh user Jatin-dudhani',
     },
     {
       label: 'LinkedIn',
       value: 'jatin-dudhani',
       href: 'https://www.linkedin.com/in/jatin-dudhani-057664254/',
-      mark: 'IN',
+      cmd: 'in/jatin-dudhani',
     },
     {
       label: 'Email',
       value: 'jatindudhani07@gmail.com',
       href: `mailto:${contactEmail}`,
-      mark: '@',
+      cmd: 'mail jatindudhani07@gmail.com',
     },
   ]
 
   return (
     <motion.section
       id="contact"
-      className="py-24 text-[var(--foreground)]"
+      className="py-24 text-[var(--foreground)] font-mono"
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
-      viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.5 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.3 }}
     >
       <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto mb-12 max-w-3xl text-center">
-          <p className="text-sm font-bold uppercase text-[#81dec8]">Contact</p>
-          <h2 className="mt-3 text-4xl font-black sm:text-5xl">Get in touch.</h2>
-          <p className="mt-4 text-lg text-[var(--muted)]">
-            Have a project in mind or want to collaborate? Reach out and I will get back to you.
+        <motion.div
+          className="mb-8 text-center"
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={spring}
+        >
+          <p className="text-sm text-[var(--green)]">
+            $ <span className="text-[var(--muted)]">cat</span> /home/jatin/contact.md
           </p>
-        </div>
+          <h2 className="mt-2 text-2xl font-bold text-[var(--foreground)]"># Get In Touch</h2>
+          <p className="mt-2 text-sm text-[var(--muted)]">
+            Have a project in mind? Want to collaborate? Drop a message.
+          </p>
+        </motion.div>
 
-        <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
-          {contactLinks.map((item) => (
-            <a
+        <div className="mb-6 grid grid-cols-1 gap-3 md:grid-cols-3">
+          {contactLinks.map((item, i) => (
+            <motion.a
               key={item.label}
               href={item.href}
               target={item.href.startsWith('http') ? '_blank' : undefined}
               rel={item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-              className="group rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-5 transition hover:-translate-y-1 hover:border-[#37ab8e]/45 hover:bg-[var(--card-bg)]"
+              initial={{ opacity: 0, y: 14 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ ...spring, delay: 0.05 + i * 0.04 }}
+              whileHover={{ y: -2, transition: { duration: 0.12 } }}
+              className="group rounded border border-[var(--card-border)] bg-[var(--card-bg)] p-4 transition-shadow hover:border-[var(--green)]/40 hover:shadow-[0_0_14px_rgba(63,185,80,0.05)]"
             >
-              <div className="mb-4 grid size-11 place-items-center rounded-lg bg-[#f2a65a]/14 text-sm font-black text-[#f2a65a]">
-                {item.mark}
-              </div>
-              <h3 className="font-black text-[var(--foreground)]">{item.label}</h3>
-              <p className="mt-2 break-all text-sm text-[var(--muted)] group-hover:text-[var(--foreground)]/70">{item.value}</p>
-            </a>
+              <div className="text-xs text-[var(--green)]">$ {item.cmd}</div>
+              <h3 className="mt-2 text-sm font-bold text-[var(--foreground)]">{item.label}</h3>
+              <p className="mt-1 text-xs text-[var(--muted)]">{item.value}</p>
+            </motion.a>
           ))}
         </div>
 
-        <form
+        <motion.form
           onSubmit={handleSubmit}
-          className="mx-auto max-w-2xl rounded-lg border border-[var(--card-border)] bg-[var(--card-bg)] p-6 shadow-[0_24px_70px_rgba(0,0,0,0.32)] md:p-8"
+          initial={{ opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ ...spring, delay: 0.1 }}
+          className="mx-auto max-w-2xl rounded border border-[var(--card-border)] bg-[var(--card-bg)] p-6"
         >
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="mb-4 flex items-center gap-2">
+            <span className="size-2 rounded-full bg-[var(--green)]" />
+            <span className="size-2 rounded-full bg-[var(--amber)]" />
+            <span className="size-2 rounded-full bg-[var(--red)]" />
+            <span className="ml-2 text-xs text-[var(--muted)]">contact-form.sh</span>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="name" className="block text-sm font-bold text-[var(--muted)]">
-                Name
+              <label htmlFor="name" className="block text-xs font-semibold text-[var(--muted)]">
+                $ name
               </label>
               <input
                 type="text"
@@ -115,14 +139,14 @@ export default function Contact() {
                 value={formData.name}
                 onChange={handleChange}
                 required
-                className="mt-2 w-full rounded-lg border border-[var(--card-border)] bg-[var(--background)]/45 px-4 py-3 text-base text-[var(--foreground)] outline-none transition placeholder:text-[var(--muted)]/30 focus:border-[#37ab8e]/70 focus:bg-[var(--background)]/60"
-                placeholder="Your name"
+                className="mt-1 w-full rounded border border-[var(--card-border)] bg-[var(--background)]/50 px-3 py-2 text-sm text-[var(--foreground)] outline-none transition-all duration-150 placeholder:text-[var(--muted)]/40 font-mono focus:border-[var(--green)]/60 focus:shadow-[0_0_12px_rgba(63,185,80,0.08)]"
+                placeholder="your name"
               />
             </div>
 
             <div>
-              <label htmlFor="email" className="block text-sm font-bold text-[var(--muted)]">
-                Email
+              <label htmlFor="email" className="block text-xs font-semibold text-[var(--muted)]">
+                $ email
               </label>
               <input
                 type="email"
@@ -131,15 +155,15 @@ export default function Contact() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className="mt-2 w-full rounded-lg border border-[var(--card-border)] bg-[var(--background)]/45 px-4 py-3 text-base text-[var(--foreground)] outline-none transition placeholder:text-[var(--muted)]/30 focus:border-[#37ab8e]/70 focus:bg-[var(--background)]/60"
-                placeholder="your@email.com"
+                className="mt-1 w-full rounded border border-[var(--card-border)] bg-[var(--background)]/50 px-3 py-2 text-sm text-[var(--foreground)] outline-none transition-all duration-150 placeholder:text-[var(--muted)]/40 font-mono focus:border-[var(--green)]/60 focus:shadow-[0_0_12px_rgba(63,185,80,0.08)]"
+                placeholder="you@example.com"
               />
             </div>
           </div>
 
-          <div className="mt-5">
-            <label htmlFor="message" className="block text-sm font-bold text-[var(--muted)]">
-              Message
+          <div className="mt-4">
+            <label htmlFor="message" className="block text-xs font-semibold text-[var(--muted)]">
+              $ message
             </label>
             <textarea
               id="message"
@@ -147,31 +171,41 @@ export default function Contact() {
               value={formData.message}
               onChange={handleChange}
               required
-              rows={5}
-              className="mt-2 w-full resize-none rounded-lg border border-[var(--card-border)] bg-[var(--background)]/45 px-4 py-3 text-base text-[var(--foreground)] outline-none transition placeholder:text-[var(--muted)]/30 focus:border-[#37ab8e]/70 focus:bg-[var(--background)]/60"
-              placeholder="Your message..."
+              rows={4}
+              className="mt-1 w-full resize-none rounded border border-[var(--card-border)] bg-[var(--background)]/50 px-3 py-2 text-sm text-[var(--foreground)] outline-none transition-all duration-150 placeholder:text-[var(--muted)]/40 font-mono focus:border-[var(--green)]/60 focus:shadow-[0_0_12px_rgba(63,185,80,0.08)]"
+              placeholder="your message..."
             />
           </div>
 
-          <button
+          <motion.button
             type="submit"
             disabled={isSubmitting}
-            className="mt-6 w-full rounded-lg bg-[#37ab8e] px-6 py-3 font-black text-[#07110f] transition hover:-translate-y-0.5 hover:bg-[#81dec8] disabled:opacity-60"
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.98 }}
+            className="mt-4 w-full rounded border border-[var(--green)] bg-[var(--green)]/10 px-4 py-2.5 text-sm font-semibold text-[var(--green)] transition-all duration-200 hover:bg-[var(--green)] hover:text-[var(--background)] hover:shadow-[0_0_18px_rgba(63,185,80,0.2)] disabled:opacity-50"
           >
-            {isSubmitting ? 'Sending...' : 'Send Message'}
-          </button>
+            {isSubmitting ? '$ sending...' : '$ send --to jatin'}
+          </motion.button>
 
           {submitStatus === 'success' && (
-            <p className="mt-4 text-center text-sm text-[#37ab8e]">
-              Message sent successfully! I will get back to you soon.
-            </p>
+            <motion.p
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-3 text-center text-xs text-[var(--green)]"
+            >
+              [OK] Message sent. I will get back to you soon.
+            </motion.p>
           )}
           {submitStatus === 'error' && (
-            <p className="mt-4 text-center text-sm text-[#f26b5a]">
-              Failed to send. Please try again or email me directly.
-            </p>
+            <motion.p
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mt-3 text-center text-xs text-[var(--red)]"
+            >
+              [ERR] Failed to send. Try emailing directly.
+            </motion.p>
           )}
-        </form>
+        </motion.form>
       </div>
     </motion.section>
   )
