@@ -64,6 +64,10 @@ export default function RootLayout({
             `.replace(/\s+/g, " "),
           }}
         />
+        <script async src="https://plausible.io/js/pa-n21_3K1_J3Rf5Z7w_WNJJ.js" />
+        <script dangerouslySetInnerHTML={{
+          __html: `window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`,
+        }} />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
