@@ -23,22 +23,26 @@ const MODELS = [
 ]
 
 async function tryModel(apiKey: string, message: string, model: string) {
-  const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+  const url = 'https://openrouter.ai/api/v1/chat/completions'
+  const body = JSON.stringify({
+    model,
+    messages: [
+      { role: 'system', content: SYSTEM_PROMPT },
+      { role: 'user', content: message },
+    ],
+    max_tokens: 300,
+  })
+
+  const res = await fetch(url, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       Authorization: `Bearer ${apiKey}`,
       'HTTP-Referer': 'https://portfolio-jade-six-34.vercel.app',
     },
-    body: JSON.stringify({
-      model,
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT },
-        { role: 'user', content: message },
-      ],
-      max_tokens: 300,
-    }),
+    body,
   })
+
   if (!res.ok) {
     const errText = await res.text()
     console.error(`OpenRouter error (${model}):`, res.status, errText)
@@ -58,9 +62,15 @@ export async function POST(request: Request) {
 
     const apiKey = process.env.OPENROUTER_API_KEY
     if (!apiKey) {
+      console.error('OPENROUTER_API_KEY is not set')
       return NextResponse.json({
         reply: 'AI chat is not configured yet. Add OPENROUTER_API_KEY to your environment variables.',
       })
+    }
+
+    if (!apiKey.startsWith('sk-or-v1-')) {
+      console.error('OPENROUTER_API_KEY has invalid format:', apiKey.slice(0, 15))
+      return NextResponse.json({ reply: 'API key format is invalid.' }, { status: 500 })
     }
 
     for (const model of MODELS) {
@@ -71,7 +81,8 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ reply: 'AI service temporarily unavailable. Try again later.' }, { status: 502 })
   } catch (err) {
-    console.error('Chat API error:', err)
+    const msg = err instanceof Error ? err.message : String(err)
+    console.error('Chat API error:', msg)
     return NextResponse.json({ reply: 'Something went wrong. Try again.' }, { status: 500 })
   }
 }
