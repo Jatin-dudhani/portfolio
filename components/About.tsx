@@ -46,20 +46,26 @@ export default function About() {
             transition={{ ...spring, delay: 0.08 }}
           >
             <p>
-              Full-Stack Developer with expertise in <span className="text-[var(--green)]">React.js, Next.js, TypeScript, Node.js, Express.js, and MongoDB</span>.
-              Experienced in engineering end-to-end web applications featuring LLM integrations via AI SDK and OpenRouter,
-              AI-powered tools with OpenAI API, and high-performance RESTful APIs with JWT authentication.
-            </p>
-            <p>
-              Proficient in modern frontend development with <span className="text-[var(--amber)]">Tailwind CSS, Redux state management,
-              Framer Motion animations, and responsive design patterns</span>. Strong understanding of full-stack deployment
-              workflows including CI/CD pipelines, Firebase hosting and authentication, and cloud deployment on Vercel and Render.
-            </p>
-            <p>
-              Proven ability to build complete production-grade applications from database schema design to user interface implementation.
-              Also experienced in <span className="text-[var(--green)]">C++ systems programming</span> (DPI engines, network protocol analysis)
-              and <span className="text-[var(--green-bright)]">AI/LLM infrastructure</span> (RAG pipelines, vector search, embeddings).
-            </p>
+                Full-Stack Developer with expertise in <span className="text-[var(--green)]">React.js, Next.js, TypeScript, Node.js, Express.js, and MongoDB</span>.
+                Experienced in engineering end-to-end web applications featuring LLM integrations via AI SDK and OpenRouter,
+                AI-powered tools with OpenAI API, and high-performance RESTful APIs with JWT authentication.
+              </p>
+              <p>
+                Proficient in modern frontend development with <span className="text-[var(--amber)]">Tailwind CSS, Redux state management,
+                Framer Motion animations, and responsive design patterns</span>. Strong understanding of full-stack deployment
+                workflows including CI/CD pipelines, Firebase hosting and authentication, and cloud deployment on Vercel and Render.
+              </p>
+              <p>
+                Proven ability to build complete production-grade applications from database schema design to user interface implementation.
+                Also experienced in <span className="text-[var(--green)]">C++ systems programming</span> (DPI engines, network protocol analysis)
+                and <span className="text-[var(--green-bright)]">AI/LLM infrastructure</span> (RAG pipelines, vector search, embeddings).
+                Currently deepening expertise in <span className="text-[var(--amber)]">DevOps, cloud engineering, and AI modeling</span>.
+              </p>
+              <p className="pt-2 border-t border-[var(--card-border)]">
+                <span className="text-[var(--green)]">25</span> &bull; Hanumangarh Jn, Rajasthan &bull;
+                Aspiring <span className="text-[var(--amber)]">DevOps / Cloud Engineer</span>.
+                Blunt, straightforward, and leadership-driven. Outside code: ghazals, shayari, cricket, chess, and long walks.
+              </p>
           </motion.div>
 
           <motion.div
@@ -83,6 +89,7 @@ export default function About() {
                 'Set up end-to-end CI/CD pipelines with Docker, AWS & GitLab',
                 'TA for IoT course — improved lab completion to ~95%',
                 'Cloud Computing cert (NPTEL) — 74.65%',
+                'Currently pursuing AWS, DevOps & AI certifications',
               ].map((item, i) => (
                 <motion.div
                   key={item}

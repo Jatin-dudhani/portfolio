@@ -32,10 +32,13 @@ clear        - clear terminal
 sudo         - try it ;)
 matrix       - toggle matrix rain`,
 
-  about: `Full-Stack Developer | CS @ LNMIIT Jaipur
+  about: `Full-Stack Developer | 25 | Hanumangarh Jn, Rajasthan
+CS @ LNMIIT Jaipur (May 2026)
 Expertise: React, Next.js, TypeScript, Node.js, Express, MongoDB
 Building: DPI engines (C++), RAG pipelines (Python), AI apps (AI SDK)
-Exploring: distributed systems, LLM infra, developer tooling`,
+Focusing: DevOps / Cloud Engineering (AWS, Docker, K8s)
+Outside code: ghazals, shayari, cricket, chess, long walks
+Philosophy: live in the moment, don't overthink, pursue what you like`,
 
   skills: `languages    JavaScript(ES6+), TypeScript, HTML5, CSS3, C++, Python
 frontend     React, Next.js, Redux Toolkit, Tailwind, Framer Motion, shadcn/ui
@@ -54,6 +57,7 @@ devops-pipeline      Docker + AWS + GitLab CI/CD`,
   '--resume': `╔══════════════════════════════════════════╗
 ║          JATIN DUDHANI — RESUME          ║
 ║          Full-Stack Developer            ║
+║          25 · Hanumangarh Jn, Rajasthan  ║
 ╚══════════════════════════════════════════╝
 
 EDUCATION
@@ -65,16 +69,20 @@ EXPERIENCE
   PR Head — PLINTH Tech Fest  (2025-2026)
   Member — Aaveg Dramatic Club (2024-Present)
 
+CAREER FOCUS
+  DevOps / Cloud Engineering (AWS, Docker, K8s)
+
 TECHNICAL SKILLS
   Languages:  JavaScript, TypeScript, C++, Python
   Frontend:   React, Next.js, Redux Toolkit, Tailwind, Framer Motion
   Backend:    Node.js, Express, MongoDB, REST APIs, JWT
   AI/ML:      AI SDK, OpenAI, OpenRouter, RAG, Vector Search
-  DevOps:     Docker, Git, CI/CD, Firebase, Vercel, Render
+  DevOps:     AWS, Docker, Kubernetes, Git, CI/CD, Firebase, Vercel
 
 CERTIFICATIONS
   Cloud Computing — NPTEL (74.65%)
   Privacy & Security in Social Media — NPTEL (75.58%)
+  Pursuing: AWS, DevOps & AI certifications
 
 PROJECTS
   • DPI Engine (C++) — Deep packet inspection, 25+ classifiers
@@ -83,6 +91,20 @@ PROJECTS
   • SimBusiness — Business simulation (system design)
   • Netflix GPT — Netflix clone w/ AI recs
   • DevOps Pipeline — Docker + AWS + GitLab CI/CD
+
+PERSONALITY
+  Blunt, straightforward, leadership-driven, helpful
+  Often misunderstood as rude (just direct)
+
+INTERESTS
+  Music:  Ghazals, old songs, Urdu/Hindi shayari
+  Sports: Cricket, football, track & field
+  Games:  Chess
+  Other:  Walking, strolling
+  Goal:   Improve physique
+
+PHILOSOPHY
+  "Live in the moment. Don't overthink. Pursue what you like."
 
 CONTACT
   email:    jatindudhani07@gmail.com

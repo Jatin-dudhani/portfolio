@@ -5,6 +5,9 @@ export async function GET() {
   const profile = {
     name: 'Jatin Dudhani',
     title: 'Full-Stack Developer',
+    age: 25,
+    location: 'Hanumangarh Jn, Rajasthan, India',
+    careerFocus: 'DevOps / Cloud Engineering',
     education: {
       degree: 'B.Tech in Computer Science and Engineering',
       school: 'LNMIIT, Jaipur',
@@ -18,12 +21,24 @@ export async function GET() {
       linkedin: 'https://www.linkedin.com/in/jatin-dudhani-057664254/',
       portfolio: 'https://portfolio-jade-six-34.vercel.app',
     },
+    personality: {
+      traits: ['Blunt', 'Straightforward', 'Leadership-oriented', 'Helpful', 'Communicative'],
+      oftenMisunderstoodAs: 'Rude due to being very direct',
+      workStyle: 'Blunt, leadership-driven, helpful',
+    },
+    interests: {
+      music: ['Ghazals', 'Old Hindi/Urdu songs', 'Shayari'],
+      sports: ['Cricket', 'Football', 'Track & Field'],
+      hobbies: ['Chess', 'Walking', 'Strolling', 'Listening to poetry'],
+      fitness: 'Working on improving physique',
+      philosophy: `Live in the moment. Don't overthink. Pursue what you like.`,
+    },
     skills: {
       languages: ['JavaScript (ES6+)', 'TypeScript', 'HTML5', 'CSS3', 'C++', 'Python'],
       frontend: ['React.js', 'Next.js', 'Redux Toolkit', 'Tailwind CSS', 'Framer Motion', 'shadcn/ui', 'Vite'],
       backend: ['Node.js', 'Express.js', 'REST API Design', 'JWT Auth', 'MongoDB', 'MVC Architecture'],
       ai: ['AI SDK', 'OpenAI API', 'OpenRouter', 'LLM Integration', 'RAG', 'Vector Search', 'Zod', 'React Flow'],
-      devops: ['Git', 'GitHub', 'Docker', 'Kubernetes', 'Firebase', 'Vercel', 'Render', 'CI/CD'],
+      devops: ['AWS', 'Docker', 'Kubernetes', 'Git', 'GitHub', 'Firebase', 'Vercel', 'Render', 'CI/CD'],
       systems: ['C++', 'Multi-threading', 'TCP/IP', 'TLS/SSL', 'PCAP', 'DPI'],
     },
     experience: [

@@ -23,7 +23,7 @@ const skillCategories = [
   },
   {
     category: 'DevOps & Cloud',
-    skills: ['Git', 'GitHub', 'Docker', 'Kubernetes', 'Firebase', 'Vercel', 'Render', 'CI/CD'],
+    skills: ['AWS', 'Docker', 'Kubernetes', 'Git', 'GitHub', 'Firebase', 'Vercel', 'Render', 'CI/CD'],
   },
   {
     category: 'Systems & Networking',
