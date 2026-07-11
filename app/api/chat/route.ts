@@ -1,5 +1,22 @@
 import { NextResponse } from 'next/server'
 
+const RATE_LIMIT = 5
+const RATE_WINDOW = 60_000
+
+const hits = new Map<string, { count: number; resetAt: number }>()
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const entry = hits.get(ip)
+  if (!entry || now > entry.resetAt) {
+    hits.set(ip, { count: 1, resetAt: now + RATE_WINDOW })
+    return true
+  }
+  if (entry.count >= RATE_LIMIT) return false
+  entry.count++
+  return true
+}
+
 const SYSTEM_PROMPT = `You are a helpful assistant for Jatin Dudhani's portfolio website. Answer questions about Jatin's skills, experience, projects, and background. Be concise and technical.
 
 About Jatin:
@@ -58,6 +75,17 @@ export async function POST(request: Request) {
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
+    }
+
+    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || request.headers.get('x-real-ip')
+      || 'anonymous'
+
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { reply: `Rate limit exceeded. Try again in a minute.` },
+        { status: 429 }
+      )
     }
 
     const apiKey = process.env.OPENROUTER_API_KEY
