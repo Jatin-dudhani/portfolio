@@ -8,3 +8,22 @@ export interface Project {
   image?: string
   preview?: string[]
 }
+
+export interface Post {
+  title: string
+  desc: string
+  tags: string[]
+  slug: string
+  date: string
+  lines: string[]
+}
+
+export interface ReadingItem {
+  title: string
+  author?: string
+  url?: string
+  type: 'book' | 'article' | 'paper' | 'course'
+  status: 'reading' | 'finished' | 'planned'
+  reason?: string
+  added: string
+}

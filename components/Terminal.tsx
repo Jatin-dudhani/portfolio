@@ -13,6 +13,7 @@ skills       - technical skills
 projects     - what I built
 --resume     - formatted resume
 blog         - technical writing
+reading      - what I am reading
 activity     - recent GitHub commits
 experience   - work & leadership
 education    - academic background
@@ -122,12 +123,26 @@ Aaveg Dramatic Club       Street plays for social awareness`,
   certificates: `Cloud Computing                          NPTEL (Jan-Apr 2026) — 74.65%
 Privacy & Security in Online Social Media NPTEL (Jul-Oct 2025) — 75.58%`,
 
-  blog: `technical writing about projects I built:
+  blog: `Writing & Reading — see https://jatin.dev/#blog
 
-  dpi-engine-cpp    Building a DPI Engine in C++17
-                    PCAP parsing, SNI extraction, 25+ app classification
-  rag-document-qa   RAG Pipelines with Vector Search
-                    Chunking, embeddings, retrieval, LLM-powered answers`,
+  writing:
+    dpi-engine-cpp    Building a DPI Engine in C++17
+    rag-document-qa   RAG Pipelines with Vector Search
+
+  reading (4 items):
+    The Phoenix Project (reading)
+    SRE Handbook (planned)
+    AWS Solutions Architect (reading)
+    Kubernetes in Action (planned)`,
+
+  reading: `Currently reading (4 items):
+
+  The Phoenix Project          Gene Kim                 [reading]
+  AWS Solutions Architect      A Cloud Guru             [reading]
+  Site Reliability Engineering Google                   [planned]
+  Kubernetes in Action         Marko Luksa              [planned]
+
+  Edit lib/reading.ts to add or update entries.`,
 
   activity: `Fetching latest commits from GitHub...
   Try scrolling to the #activity section on the page.`,
