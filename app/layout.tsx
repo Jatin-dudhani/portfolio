@@ -64,11 +64,6 @@ export default function RootLayout({
             `.replace(/\s+/g, " "),
           }}
         />
-        <script
-          defer
-          data-domain="portfolio-jade-six-34.vercel.app"
-          src="https://plausible.io/js/script.js"
-        />
       </head>
       <body className="min-h-full flex flex-col">{children}</body>
     </html>
