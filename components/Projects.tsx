@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { motion, useScroll, useTransform } from 'motion/react'
 import { projects } from '@/lib/projects'
 
@@ -8,6 +9,13 @@ const spring = { type: 'spring' as const, stiffness: 240, damping: 23 }
 export default function Projects() {
   const { scrollY } = useScroll()
   const y = useTransform(scrollY, [800, 2200], [0, -30])
+  const [filter, setFilter] = useState('')
+
+  const filtered = filter.trim()
+    ? projects.filter((p) =>
+        p.technologies.some((t) => t.toLowerCase().includes(filter.toLowerCase()))
+      )
+    : projects
 
   return (
     <motion.section
@@ -36,10 +44,23 @@ export default function Projects() {
             $ <span className="text-[var(--muted)]">ls</span> -la /home/jatin/projects/
           </p>
           <h2 className="mt-2 text-2xl font-bold text-[var(--foreground)]"># Featured Projects</h2>
+
+          <div className="mt-4 flex items-center gap-2 rounded border border-[var(--card-border)] bg-[var(--card-bg)] px-3 py-2 max-w-xs">
+            <span className="text-xs text-[var(--green)]">$</span>
+            <input
+              type="text"
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              placeholder="grep projects by tech..."
+              className="flex-1 bg-transparent text-xs text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]/50"
+              spellCheck={false}
+              autoComplete="off"
+            />
+          </div>
         </motion.div>
 
         <div className="grid gap-4 sm:grid-cols-2">
-          {projects.map((project, index) => (
+          {filtered.map((project, index) => (
             <motion.article
               key={project.id}
               initial={{ opacity: 0, y: 18 }}

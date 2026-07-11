@@ -11,6 +11,7 @@ const commands: Record<string, string> = {
   help: `about        - who I am
 skills       - technical skills
 projects     - what I built
+--resume     - formatted resume
 blog         - technical writing
 activity     - recent GitHub commits
 experience   - work & leadership
@@ -25,9 +26,11 @@ neofetch     - dev system info
 dark         - dark mode
 light        - light mode
 mario        - watch me run
+snake        - slithering snake
+guess        - guess the number
 clear        - clear terminal
 sudo         - try it ;)
-matrix       - follow the rabbit`,
+matrix       - toggle matrix rain`,
 
   about: `Full-Stack Developer | CS @ LNMIIT Jaipur
 Expertise: React, Next.js, TypeScript, Node.js, Express, MongoDB
@@ -47,6 +50,45 @@ rag-document-qa      RAG system for document Q&A (Python)
 simbusiness          Business simulation (system design)
 netflix-gpt          Netflix clone w/ AI recommendations
 devops-pipeline      Docker + AWS + GitLab CI/CD`,
+
+  '--resume': `╔══════════════════════════════════════════╗
+║          JATIN DUDHANI — RESUME          ║
+║          Full-Stack Developer            ║
+╚══════════════════════════════════════════╝
+
+EDUCATION
+  B.Tech CSE · LNMIIT, Jaipur · May 2026
+  CGPA: 6.5 / 10
+
+EXPERIENCE
+  Teaching Assistant — IoT    LNMIIT (Jan-Apr 2025)
+  PR Head — PLINTH Tech Fest  (2025-2026)
+  Member — Aaveg Dramatic Club (2024-Present)
+
+TECHNICAL SKILLS
+  Languages:  JavaScript, TypeScript, C++, Python
+  Frontend:   React, Next.js, Redux Toolkit, Tailwind, Framer Motion
+  Backend:    Node.js, Express, MongoDB, REST APIs, JWT
+  AI/ML:      AI SDK, OpenAI, OpenRouter, RAG, Vector Search
+  DevOps:     Docker, Git, CI/CD, Firebase, Vercel, Render
+
+CERTIFICATIONS
+  Cloud Computing — NPTEL (74.65%)
+  Privacy & Security in Social Media — NPTEL (75.58%)
+
+PROJECTS
+  • DPI Engine (C++) — Deep packet inspection, 25+ classifiers
+  • AI Project Planner — AI-powered briefs w/ visualization
+  • RAG Document QA — RAG pipeline w/ vector search
+  • SimBusiness — Business simulation (system design)
+  • Netflix GPT — Netflix clone w/ AI recs
+  • DevOps Pipeline — Docker + AWS + GitLab CI/CD
+
+CONTACT
+  email:    jatindudhani07@gmail.com
+  github:   github.com/Jatin-dudhani
+  linkedin: linkedin.com/in/jatin-dudhani
+  phone:    +91-8875843487`,
 
   experience: `TA Internet of Things    LNMIIT (Jan-Apr 2025)
                          ~95% lab completion, -30% troubleshooting
@@ -77,7 +119,7 @@ phone     +91-8875843487`,
 
   banner,
 
-  ls: `about/  skills/  projects/  blog/  activity/  experience/  education/  certificates/  contact/`,
+  ls: `about/  skills/  projects/  blog/  activity/  experience/  education/  certificates/  contact/  --resume/`,
 
   neofetch: `OS       Linux mind x86_64
 shell    bash / zsh
@@ -88,7 +130,7 @@ status   open to SDE roles`,
   sudo: `Nice try, but there's no root here.`,
   su: `Just type 'help' to see commands.`,
   exit: `Not a real shell. Type 'help'.`,
-  matrix: `You start typing... the code stares back.`,
+  matrix: `Use 'matrix' to toggle the matrix rain effect. It's already active!`,
   '': '',
 }
 
@@ -99,7 +141,16 @@ const MARIO_SPEED = 100
 
 const frames = ["(>'_')>", "<('_'<)"]
 
-export default function TerminalWidget() {
+const SNAKE_TOTAL = 40
+const SNAKE_SPEED = 120
+
+const SNAKE_BODY = ['🐍', '~', '~', '~', '~', '~', '~', '~']
+
+interface Props {
+  onMatrixToggle?: () => void
+}
+
+export default function TerminalWidget({ onMatrixToggle }: Props) {
   const { setTheme } = useTheme()
   const [history, setHistory] = useState<Line[]>([
     { text: banner, isSystem: true },
@@ -111,6 +162,8 @@ export default function TerminalWidget() {
   const [historyIndex, setHistoryIndex] = useState(-1)
   const [marioPos, setMarioPos] = useState<number | null>(null)
   const [marioFrame, setMarioFrame] = useState(0)
+  const [snakePos, setSnakePos] = useState<number | null>(null)
+  const [guessGame, setGuessGame] = useState<{ target: number; attempts: number } | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -139,14 +192,73 @@ export default function TerminalWidget() {
     return () => clearTimeout(t)
   }, [marioPos])
 
+  useEffect(() => {
+    if (snakePos === null) return
+    if (snakePos >= SNAKE_TOTAL) {
+      const t = setTimeout(() => {
+        setSnakePos(null)
+        setHistory((prev) => [
+          ...prev,
+          { text: '🐍 The snake slithered away! Type "snake" to watch again.', isSystem: true },
+          { text: '', isSystem: true },
+        ])
+      }, 0)
+      return () => clearTimeout(t)
+    }
+    const t = setTimeout(() => {
+      setSnakePos((p) => p! + 1)
+    }, SNAKE_SPEED)
+    return () => clearTimeout(t)
+  }, [snakePos])
+
   const handleCommand = useCallback(
     (cmd: string) => {
-      const trimmed = cmd.trim().toLowerCase()
-      const parts = trimmed.split(/\s+/)
+      const trimmed = cmd.trim()
+      const lower = trimmed.toLowerCase()
+      const parts = lower.split(/\s+/)
       const base = parts[0]
 
       setCommandHistory((prev) => [...prev, cmd])
       setHistoryIndex(-1)
+
+      if (guessGame) {
+        const guess = parseInt(trimmed, 10)
+        if (!isNaN(guess)) {
+          const newAttempts = guessGame.attempts + 1
+          setGuessGame((prev) => (prev ? { ...prev, attempts: newAttempts } : null))
+
+          if (guess === guessGame.target) {
+            setGuessGame(null)
+            setHistory((prev) => [
+              ...prev,
+              { text: `visitor@portfolio:~$ ${trimmed}`, isInput: true },
+              { text: `🎉 Correct! The number was ${guessGame.target}. You got it in ${newAttempts} attempt${newAttempts > 1 ? 's' : ''}!`, isSystem: true },
+            ])
+          } else if (guess < guessGame.target) {
+            setHistory((prev) => [
+              ...prev,
+              { text: `visitor@portfolio:~$ ${trimmed}`, isInput: true },
+              { text: `⬆️ Higher than ${guess}. Try again!`, isSystem: true },
+            ])
+          } else {
+            setHistory((prev) => [
+              ...prev,
+              { text: `visitor@portfolio:~$ ${trimmed}`, isInput: true },
+              { text: `⬇️ Lower than ${guess}. Try again!`, isSystem: true },
+            ])
+          }
+          return
+        }
+        if (lower === 'quit' || lower === 'exit') {
+          setGuessGame(null)
+          setHistory((prev) => [
+            ...prev,
+            { text: `visitor@portfolio:~$ ${trimmed}`, isInput: true },
+            { text: `👋 Game ended. The number was ${guessGame.target}.`, isSystem: true },
+          ])
+          return
+        }
+      }
 
       if (base === 'clear') {
         setHistory([])
@@ -175,6 +287,31 @@ export default function TerminalWidget() {
         ])
         setMarioPos(0)
         setMarioFrame(0)
+      } else if (base === 'snake') {
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: '', isSystem: true },
+        ])
+        setSnakePos(0)
+      } else if (base === 'guess') {
+        const target = Math.floor(Math.random() * 100) + 1
+        setGuessGame({ target, attempts: 0 })
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: '🎯 I am thinking of a number between 1 and 100. Type your guess!', isSystem: true },
+        ])
+      } else if (base === 'matrix') {
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+        ])
+        onMatrixToggle?.()
+        setHistory((prev) => [
+          ...prev,
+          { text: '🌧️ Matrix rain toggled.', isSystem: true },
+        ])
       } else if (base === 'date') {
         setHistory((prev) => [
           ...prev,
@@ -201,7 +338,7 @@ export default function TerminalWidget() {
         ])
       }
     },
-    [setTheme]
+    [setTheme, guessGame, setGuessGame, onMatrixToggle]
   )
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -260,6 +397,12 @@ export default function TerminalWidget() {
           <div className="text-yellow-400">
             {' '.repeat(Math.max(0, marioPos))}
             {frames[marioFrame]}
+          </div>
+        )}
+        {snakePos !== null && (
+          <div className="text-lime-400">
+            {' '.repeat(Math.max(0, snakePos))}
+            {SNAKE_BODY.join('')}
           </div>
         )}
       </div>

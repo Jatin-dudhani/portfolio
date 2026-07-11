@@ -9,7 +9,11 @@ const WORDS = ['Systems', 'Full-Stack', 'AI/LLM', 'DevOps']
 
 const spring = { type: 'spring' as const, stiffness: 220, damping: 22 }
 
-export default function Hero() {
+interface HeroProps {
+  onMatrixToggle?: () => void
+}
+
+export default function Hero({ onMatrixToggle }: HeroProps) {
   const [wordIdx, setWordIdx] = useState(0)
   const [charIdx, setCharIdx] = useState(0)
   const [deleting, setDeleting] = useState(false)
@@ -138,7 +142,7 @@ export default function Hero() {
         </div>
 
         <motion.div variants={item} className="relative w-full max-w-lg mx-auto lg:mx-0">
-          <TerminalWidget />
+          <TerminalWidget onMatrixToggle={onMatrixToggle} />
         </motion.div>
       </div>
     </motion.section>

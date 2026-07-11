@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import About from '@/components/About'
@@ -11,15 +14,20 @@ import Projects from '@/components/Projects'
 import Contact from '@/components/Contact'
 import Footer from '@/components/Footer'
 import Particles from '@/components/Particles'
+import AIChat from '@/components/AIChat'
+import MatrixRain from '@/components/MatrixRain'
 import { ThemeProvider } from '@/components/ThemeProvider'
 
 export default function Home() {
+  const [matrixActive, setMatrixActive] = useState(false)
+
   return (
     <ThemeProvider>
       <Particles />
+      <MatrixRain active={matrixActive} />
       <main className="relative z-10 flex flex-col w-full">
         <Header />
-        <Hero />
+        <Hero onMatrixToggle={() => setMatrixActive((v) => !v)} />
         <About />
         <Skills />
         <Experience />
@@ -31,6 +39,7 @@ export default function Home() {
         <Contact />
         <Footer />
       </main>
+      <AIChat />
     </ThemeProvider>
   )
 }
