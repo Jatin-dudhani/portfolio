@@ -62,7 +62,17 @@ export default function Projects() {
               </div>
 
               <h3 className="text-base font-bold text-[var(--foreground)]">{project.title}</h3>
-              <p className="mt-2 flex-1 text-sm leading-6 text-[var(--muted)]">{project.description}</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{project.description}</p>
+
+              {project.preview && (
+                <div className="mt-4 rounded border border-[var(--card-border)] bg-[var(--background)]/40 p-2.5 font-mono text-[11px] leading-5 overflow-x-auto">
+                  {project.preview.map((line, i) => (
+                    <div key={i} className={`whitespace-nowrap ${line.startsWith('$') ? 'text-[var(--foreground)]' : line.startsWith('[') && line.includes('OK]') ? 'text-[var(--green)]' : line.startsWith('[') && line.includes('ERR') ? 'text-[var(--red)]' : 'text-[var(--muted)]'}`}>
+                      {line}
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <div className="mt-4 flex flex-wrap gap-1.5">
                 {project.technologies.map((tech) => (

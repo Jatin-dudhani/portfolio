@@ -6,4 +6,5 @@ export interface Project {
   github: string
   deployed?: string
   image?: string
+  preview?: string[]
 }
