@@ -8,7 +8,6 @@ on:
 permissions:
   contents: write
   pull-requests: write
-  workflows: write
 
 jobs:
   sync:
@@ -23,6 +22,8 @@ jobs:
           node-version: 20
 
       - name: Run sync script
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node scripts/sync-github.mjs --apply
 
       - name: Create PR if changes
@@ -30,7 +31,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'chore: sync blog entries from GitHub activity'
-          branch: sync-content
+          branch: sync-content-${{ github.run_number }}
           title: '📝 Weekly content sync from GitHub'
           body: Auto-generated draft blog entries from recent GitHub repos. Review and merge.
           labels: automated
+          delete-branch: true
