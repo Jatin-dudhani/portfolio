@@ -5,23 +5,27 @@ on:
     - cron: '0 8 * * 1'  # every Monday 8 AM UTC
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pull-requests: write
+
 jobs:
   sync:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
 
       - name: Run sync script
         run: node scripts/sync-github.mjs --apply
 
       - name: Create PR if changes
-        uses: peter-evans/create-pull-request@v7
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           commit-message: 'chore: sync blog entries from GitHub activity'
