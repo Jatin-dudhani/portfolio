@@ -15,10 +15,10 @@ export default function AIChat() {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
   }, [messages])
 
-  const send = async () => {
-    const msg = input.trim()
+  const send = async (overrideMsg?: string) => {
+    const msg = (overrideMsg ?? input).trim()
     if (!msg || loading) return
-    setInput('')
+    if (!overrideMsg) setInput('')
     setMessages((prev) => [...prev, { role: 'user', text: msg }])
     setLoading(true)
 
@@ -75,7 +75,26 @@ export default function AIChat() {
 
             <div ref={scrollRef} className="h-64 overflow-y-auto px-4 py-3 space-y-3 text-xs">
               {messages.length === 0 && (
-                <p className="text-[var(--muted)] italic">Ask me anything about Jatin — skills, projects, experience...</p>
+                <div className="space-y-3 py-1">
+                  <p className="text-[var(--muted)] text-[11px] leading-relaxed">
+                    Ask anything about Jatin, or click a prompt below:
+                  </p>
+                  <div className="flex flex-col gap-1.5 pt-1">
+                    {[
+                      'Tell me about your C++ DPI engine project',
+                      'What are your core technical skills?',
+                      'Why are you targeting DevOps / Cloud roles?',
+                    ].map((prompt) => (
+                      <button
+                        key={prompt}
+                        onClick={() => send(prompt)}
+                        className="text-left text-[11px] rounded border border-[var(--card-border)] bg-[var(--card-bg)] px-2.5 py-1.5 text-[var(--foreground)] hover:border-[var(--green)]/50 hover:bg-[var(--green)]/5 transition-colors cursor-pointer"
+                      >
+                        $ {prompt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
               {messages.map((m, i) => (
                 <div key={i} className={`flex gap-2 ${m.role === 'user' ? 'justify-end' : ''}`}>
@@ -113,7 +132,7 @@ export default function AIChat() {
                 autoComplete="off"
               />
               <button
-                onClick={send}
+                onClick={() => send()}
                 disabled={loading || !input.trim()}
                 className="text-[10px] font-semibold text-[var(--green)] hover:text-[var(--green-bright)] transition-colors disabled:opacity-30 cursor-pointer"
               >

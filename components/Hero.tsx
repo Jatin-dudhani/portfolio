@@ -40,8 +40,10 @@ export default function Hero({ onMatrixToggle }: HeroProps) {
         setCharIdx((c) => c - 1)
       }, TYPING_SPEED / 2)
     } else if (deleting && charIdx === 0) {
-      setDeleting(false)
-      setWordIdx((i) => (i + 1) % WORDS.length)
+      timeout = setTimeout(() => {
+        setDeleting(false)
+        setWordIdx((i) => (i + 1) % WORDS.length)
+      }, 200)
     }
 
     return () => clearTimeout(timeout)

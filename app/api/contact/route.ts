@@ -5,6 +5,7 @@ const bodySchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email address'),
   message: z.string().min(10, 'Message must be at least 10 characters'),
+  website: z.string().optional(), // Honeypot field for bot protection
 })
 
 function escapeHtml(s: string): string {
@@ -25,10 +26,25 @@ function checkRateLimit(ip: string): boolean {
   return true
 }
 
+function isOriginAllowed(origin: string): boolean {
+  if (!origin) return true // Allow same-origin / server-to-server calls
+  try {
+    const parsed = new URL(origin)
+    const hostname = parsed.hostname
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return true
+    if (hostname === 'portfolio-jade-six-34.vercel.app') return true
+    if (hostname.endsWith('.vercel.app')) return true
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (siteUrl && hostname === new URL(siteUrl).hostname) return true
+    return false
+  } catch {
+    return false
+  }
+}
+
 export async function POST(request: Request) {
   const origin = request.headers.get('origin') || request.headers.get('referer') || ''
-  const allowedOrigins = ['http://localhost:3000', 'https://YOUR_DOMAIN.vercel.app']
-  if (!allowedOrigins.some((a) => origin.startsWith(a))) {
+  if (!isOriginAllowed(origin)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 
@@ -48,7 +64,13 @@ export async function POST(request: Request) {
       )
     }
 
-    const { name, email, message } = parsed.data
+    const { name, email, message, website } = parsed.data
+
+    // Bot honeypot check: if filled, silently succeed without sending email
+    if (website) {
+      return NextResponse.json({ success: true }, { status: 200 })
+    }
+
     const safeMessage = escapeHtml(message)
 
     if (!process.env.RESEND_API_KEY) {

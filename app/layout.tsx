@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const BASE = "https://portfolio-jade-six-34.vercel.app";
@@ -68,8 +70,43 @@ export default function RootLayout({
         <script dangerouslySetInnerHTML={{
           __html: `window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};plausible.init()`,
         }} />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'Person',
+              name: 'Jatin Dudhani',
+              jobTitle: 'Systems & Full-Stack Developer',
+              url: BASE,
+              sameAs: [
+                'https://github.com/Jatin-dudhani',
+                'https://www.linkedin.com/in/jatin-dudhani-057664254/',
+              ],
+              alumnusOf: {
+                '@type': 'CollegeOrUniversity',
+                name: 'The LNM Institute of Information Technology',
+              },
+              knowsAbout: [
+                'Systems Programming',
+                'Full-Stack Web Development',
+                'DevOps',
+                'Cloud Computing',
+                'Deep Packet Inspection',
+                'C++',
+                'Next.js',
+                'React',
+                'TypeScript',
+              ],
+            }),
+          }}
+        />
       </head>
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        {children}
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   );
 }

@@ -385,6 +385,23 @@ export default function TerminalWidget({ onMatrixToggle }: Props) {
       return
     }
 
+    if (e.key === 'Tab') {
+      e.preventDefault()
+      const query = input.trim().toLowerCase()
+      if (!query) return
+      const available = Object.keys(commands).filter((c) => c && c.startsWith(query))
+      if (available.length === 1) {
+        setInput(available[0])
+      } else if (available.length > 1) {
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${input}`, isInput: true },
+          { text: available.join('  '), isSystem: true },
+        ])
+      }
+      return
+    }
+
     if (e.key === 'ArrowUp') {
       e.preventDefault()
       if (commandHistory.length === 0) return
@@ -445,7 +462,7 @@ export default function TerminalWidget({ onMatrixToggle }: Props) {
       </div>
 
       <div className="flex items-center border-t border-white/8 px-4 py-3">
-        <span className="mr-2 font-mono text-sm text-[#81dec8]">$</span>
+        <span className="mr-2 font-mono text-sm text-[var(--green)]">$</span>
         <input
           ref={inputRef}
           type="text"
@@ -453,10 +470,27 @@ export default function TerminalWidget({ onMatrixToggle }: Props) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={handleKeyDown}
           className="flex-1 bg-transparent font-mono text-sm text-white outline-none"
-          placeholder="help"
+          placeholder="help (press Tab to autocomplete)"
           spellCheck={false}
           autoComplete="off"
         />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-1.5 border-t border-white/5 bg-black/20 px-3 py-2">
+        <span className="text-[10px] text-white/30 font-mono">quick:</span>
+        {['skills', 'projects', '--resume', 'matrix', 'snake', 'guess', 'clear'].map((cmd) => (
+          <button
+            key={cmd}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleCommand(cmd)
+            }}
+            className="rounded border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-mono text-[var(--green)] hover:border-[var(--green)]/50 hover:bg-[var(--green)]/10 transition-colors cursor-pointer"
+          >
+            {cmd}
+          </button>
+        ))}
       </div>
     </div>
   )

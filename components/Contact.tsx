@@ -12,6 +12,7 @@ export default function Contact() {
     name: '',
     email: '',
     message: '',
+    website: '',
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
@@ -36,7 +37,7 @@ export default function Contact() {
       if (!res.ok) throw new Error('Failed to send')
 
       setSubmitStatus('success')
-      setFormData({ name: '', email: '', message: '' })
+      setFormData({ name: '', email: '', message: '', website: '' })
     } catch {
       setSubmitStatus('error')
     } finally {
@@ -138,6 +139,20 @@ export default function Contact() {
             <span className="size-2 rounded-full bg-[var(--amber)]" />
             <span className="size-2 rounded-full bg-[var(--red)]" />
             <span className="ml-2 text-xs text-[var(--muted)]">contact-form.sh</span>
+          </div>
+
+          {/* Bot honeypot field - invisible to human users */}
+          <div className="hidden" aria-hidden="true">
+            <label htmlFor="website">Website</label>
+            <input
+              type="text"
+              id="website"
+              name="website"
+              value={formData.website}
+              onChange={handleChange}
+              tabIndex={-1}
+              autoComplete="off"
+            />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
