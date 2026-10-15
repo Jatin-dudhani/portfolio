@@ -34,7 +34,29 @@ export default function Header() {
                 $ {link}
               </button>
             ))}
+            <Link
+              href="/resume"
+              className="px-3 py-1.5 rounded transition-all duration-150 hover:text-[var(--amber)] hover:bg-[var(--amber)]/5 cursor-pointer text-[var(--amber)]"
+            >
+              $ resume
+            </Link>
           </nav>
+
+          <button
+            onClick={() => {
+              window.dispatchEvent(new CustomEvent('open-command-palette'))
+            }}
+            className="flex items-center gap-1.5 rounded border border-[var(--card-border)] bg-[var(--card-bg)] px-2.5 py-1 text-xs text-[var(--muted)] hover:border-[var(--green)] hover:text-[var(--green)] transition-all cursor-pointer"
+            aria-label="Open command palette"
+            title="Search & Commands (⌘K / Ctrl+K)"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+            <span className="hidden sm:inline">cmd</span>
+            <kbd className="hidden sm:inline rounded border border-[var(--card-border)] bg-[var(--background)] px-1 py-0.2 text-[9px] text-[var(--green)]">⌘K</kbd>
+          </button>
 
           <SoundToggle />
           <ThemeToggle />
@@ -59,6 +81,15 @@ export default function Header() {
             className="md:hidden overflow-hidden border-t border-[var(--card-border)] bg-[var(--nav-bg)] backdrop-blur-xl font-mono"
           >
             <div className="px-4 py-3 flex flex-col gap-1.5">
+              <button
+                onClick={() => {
+                  setIsOpen(false)
+                  window.dispatchEvent(new CustomEvent('open-command-palette'))
+                }}
+                className="rounded px-4 py-2 text-sm text-left text-[var(--green)] transition-all duration-150 hover:bg-[var(--green)]/10 cursor-pointer font-semibold"
+              >
+                &gt; search &amp; commands (⌘K)
+              </button>
               {links.map((link) => (
                 <button
                   key={link}
@@ -68,6 +99,13 @@ export default function Header() {
                   $ {link}
                 </button>
               ))}
+              <Link
+                href="/resume"
+                onClick={() => setIsOpen(false)}
+                className="rounded px-4 py-2 text-sm text-left text-[var(--amber)] transition-all duration-150 hover:bg-[var(--amber)]/10 cursor-pointer"
+              >
+                $ resume (print / ATS)
+              </Link>
             </div>
           </motion.nav>
         )}

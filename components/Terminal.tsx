@@ -29,7 +29,7 @@ ls           - list available directories
 date         - current timestamp
 history      - commands run in session
 echo         - print text to terminal
-dark / light - toggle color modes
+theme        - set theme (dark, amber, cyberpunk, light)
 mario        - watch Mario run
 snake        - animated ASCII snake
 guess        - number guessing mini-game
@@ -329,19 +329,39 @@ export default function TerminalWidget({ onMatrixToggle }: Props) {
         return
       }
 
-      if (base === 'dark') {
+      if (base === 'dark' || (base === 'theme' && parts[1] === 'dark')) {
         setTheme('dark')
         setHistory((prev) => [
           ...prev,
           { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
-          { text: 'Switched to dark mode.', isSystem: true },
+          { text: 'Switched to Matrix Dark theme.', isSystem: true },
         ])
-      } else if (base === 'light') {
+      } else if (base === 'light' || (base === 'theme' && parts[1] === 'light')) {
         setTheme('light')
         setHistory((prev) => [
           ...prev,
           { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
-          { text: 'Switched to light mode.', isSystem: true },
+          { text: 'Switched to Paper Terminal Light theme.', isSystem: true },
+        ])
+      } else if (base === 'amber' || (base === 'theme' && parts[1] === 'amber')) {
+        setTheme('amber')
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: 'Switched to Phosphor CRT Amber theme.', isSystem: true },
+        ])
+      } else if (base === 'cyberpunk' || base === 'cyber' || (base === 'theme' && (parts[1] === 'cyberpunk' || parts[1] === 'cyber'))) {
+        setTheme('cyberpunk')
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: 'Switched to Cyberpunk Neon theme.', isSystem: true },
+        ])
+      } else if (base === 'theme') {
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: 'Usage: theme [dark | amber | cyberpunk | light]', isSystem: true },
         ])
       } else if (base === 'mario') {
         setHistory((prev) => [

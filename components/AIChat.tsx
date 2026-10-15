@@ -15,6 +15,12 @@ export default function AIChat() {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
   }, [messages])
 
+  useEffect(() => {
+    const handleOpenChat = () => setOpen(true)
+    window.addEventListener('open-ai-chat', handleOpenChat)
+    return () => window.removeEventListener('open-ai-chat', handleOpenChat)
+  }, [])
+
   const send = async (overrideMsg?: string) => {
     const msg = (overrideMsg ?? input).trim()
     if (!msg || loading) return

@@ -32,6 +32,38 @@
   --nav-border: rgba(0,0,0,0.08);
 }
 
+[data-theme="amber"] {
+  --background: #0f0d06;
+  --foreground: #f3dfb6;
+  --green: #ffaa00;
+  --green-dim: #d48800;
+  --green-bright: #ffc44d;
+  --amber: #ffaa00;
+  --amber-bright: #ffc44d;
+  --red: #ff5544;
+  --muted: #a69168;
+  --card-bg: rgba(255, 170, 0, 0.04);
+  --card-border: rgba(255, 170, 0, 0.15);
+  --nav-bg: rgba(15, 13, 6, 0.92);
+  --nav-border: rgba(255, 170, 0, 0.12);
+}
+
+[data-theme="cyberpunk"] {
+  --background: #0d0818;
+  --foreground: #ddebff;
+  --green: #00f0ff;
+  --green-dim: #00b4cc;
+  --green-bright: #5df7ff;
+  --amber: #ff007f;
+  --amber-bright: #ff4da6;
+  --red: #ff2a55;
+  --muted: #8d98ba;
+  --card-bg: rgba(0, 240, 255, 0.04);
+  --card-border: rgba(0, 240, 255, 0.15);
+  --nav-bg: rgba(13, 8, 24, 0.92);
+  --nav-border: rgba(0, 240, 255, 0.12);
+}
+
 * { box-sizing: border-box; }
 
 html { scroll-behavior: smooth; }
@@ -128,4 +160,23 @@ body::before {
 
 @media (max-width: 640px) {
   body { font-size: 0.875rem; }
+}
+
+@media print {
+  @page {
+    margin: 1.2cm;
+    size: letter portrait;
+  }
+  body {
+    background: #ffffff !important;
+    color: #111111 !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+  }
+  body::before {
+    display: none !important;
+  }
+  .particle {
+    display: none !important;
+  }
 }
