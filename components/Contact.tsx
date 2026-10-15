@@ -66,6 +66,18 @@ export default function Contact() {
     },
   ]
 
+  const [copiedLabel, setCopiedLabel] = useState<string | null>(null)
+
+  const handleCopy = (e: React.MouseEvent, label: string, val: string) => {
+    e.preventDefault()
+    e.stopPropagation()
+    navigator.clipboard.writeText(val).then(() => {
+      setCopiedLabel(label)
+      import('@/lib/sound').then((s) => s.playSuccessBeep())
+      setTimeout(() => setCopiedLabel(null), 1800)
+    })
+  }
+
   return (
     <motion.section
       id="contact"
@@ -119,7 +131,17 @@ export default function Contact() {
               whileHover={{ y: -2, transition: { duration: 0.12 } }}
               className="group rounded border border-[var(--card-border)] bg-[var(--card-bg)] p-4 transition-shadow hover:border-[var(--green)]/40 hover:shadow-[0_0_14px_rgba(63,185,80,0.05)]"
             >
-              <div className="text-xs text-[var(--green)]">$ {item.cmd}</div>
+              <div className="flex items-center justify-between">
+                <div className="text-xs text-[var(--green)]">$ {item.cmd}</div>
+                <button
+                  type="button"
+                  onClick={(e) => handleCopy(e, item.label, item.value)}
+                  className="rounded border border-[var(--card-border)] bg-[var(--background)]/60 px-1.5 py-0.5 text-[9px] text-[var(--muted)] hover:text-[var(--green)] hover:border-[var(--green)]/40 transition-colors cursor-pointer"
+                  title={`Copy ${item.label}`}
+                >
+                  {copiedLabel === item.label ? 'COPIED!' : 'COPY'}
+                </button>
+              </div>
               <h3 className="mt-2 text-sm font-bold text-[var(--foreground)]">{item.label}</h3>
               <p className="mt-1 text-xs text-[var(--muted)]">{item.value}</p>
             </motion.a>

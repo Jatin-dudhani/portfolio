@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTheme } from 'next-themes'
+import { playKeyClick, playSuccessBeep } from '@/lib/sound'
 
 const banner = `╔══════════════════════════════════╗
 ║   JATIN DUDHANI — PORTFOLIO CLI  ║
@@ -11,7 +12,7 @@ const commands: Record<string, string> = {
   help: `about        - who I am
 skills       - technical skills
 projects     - what I built
---resume     - formatted resume
+--resume     - formatted resume (or 'resume')
 blog         - technical writing
 reading      - what I am reading
 activity     - recent GitHub commits
@@ -19,19 +20,21 @@ experience   - work & leadership
 education    - academic background
 certificates - NPTEL certs
 contact      - how to reach me
+socials      - GitHub, LinkedIn, email
+curl         - live test /api/jatin endpoint
+neofetch     - dev system & runtime specs
+uptime       - session uptime
 whoami       - display identity
-banner       - show banner
-ls           - list sections
-date         - current time
-neofetch     - dev system info
-dark         - dark mode
-light        - light mode
-mario        - watch me run
-snake        - slithering snake
-guess        - guess the number
-clear        - clear terminal
-sudo         - try it ;)
-matrix       - toggle matrix rain`,
+ls           - list available directories
+date         - current timestamp
+history      - commands run in session
+echo         - print text to terminal
+dark / light - toggle color modes
+mario        - watch Mario run
+snake        - animated ASCII snake
+guess        - number guessing mini-game
+matrix       - toggle matrix digital rain
+clear        - clear terminal screen`,
 
   about: `Full-Stack Developer | 25 | Hanumangarh Jn, Rajasthan
 CS @ LNMIIT Jaipur (May 2026)
@@ -203,6 +206,29 @@ export default function TerminalWidget({ onMatrixToggle }: Props) {
   const [guessGame, setGuessGame] = useState<{ target: number; attempts: number } | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
+  const sessionStartRef = useRef<number>(0)
+
+  useEffect(() => {
+    if (!sessionStartRef.current) {
+      sessionStartRef.current = Date.now()
+    }
+  }, [])
+
+  useEffect(() => {
+    const handleGlobalKey = (e: KeyboardEvent) => {
+      if (e.key === '`' || e.key === '~') {
+        const target = e.target as HTMLElement | null
+        const isInput = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA')
+        if (!isInput) {
+          e.preventDefault()
+          inputRef.current?.focus()
+          inputRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+        }
+      }
+    }
+    window.addEventListener('keydown', handleGlobalKey)
+    return () => window.removeEventListener('keydown', handleGlobalKey)
+  }, [])
 
   useEffect(() => {
     const el = scrollRef.current
@@ -266,6 +292,7 @@ export default function TerminalWidget({ onMatrixToggle }: Props) {
 
           if (guess === guessGame.target) {
             setGuessGame(null)
+            playSuccessBeep()
             setHistory((prev) => [
               ...prev,
               { text: `visitor@portfolio:~$ ${trimmed}`, isInput: true },
@@ -355,11 +382,83 @@ export default function TerminalWidget({ onMatrixToggle }: Props) {
           { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
           { text: new Date().toLocaleString(), isSystem: true },
         ])
+      } else if (base === 'uptime') {
+        const start = sessionStartRef.current || Date.now()
+        const uptimeSec = Math.floor((Date.now() - start) / 1000)
+        const mins = Math.floor(uptimeSec / 60)
+        const secs = uptimeSec % 60
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: `up ${mins}m ${secs}s, 1 user, load average: 0.08, 0.03, 0.01`, isSystem: true },
+        ])
+      } else if (base === 'history') {
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: commandHistory.length ? commandHistory.map((c, i) => `  ${String(i + 1).padStart(3, ' ')}  ${c}`).join('\n') : '  (no commands in history)', isSystem: true },
+        ])
+      } else if (base === 'echo') {
+        const echoed = cmd.replace(/^echo\s*/i, '').replace(/^['"]|['"]$/g, '')
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: echoed, isSystem: true },
+        ])
+      } else if (base === 'socials' || base === 'links') {
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: `GitHub:    https://github.com/Jatin-dudhani\nLinkedIn:  https://www.linkedin.com/in/jatin-dudhani-057664254/\nEmail:     jatindudhani07@gmail.com\nPortfolio: https://portfolio-jade-six-34.vercel.app`, isSystem: true },
+        ])
+      } else if (base === 'resume' || (base === 'cat' && parts[1]?.includes('resume'))) {
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: commands['--resume'], isSystem: true },
+        ])
+      } else if (base === 'curl') {
+        const target = parts[1] || '/api/jatin'
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: `[curl] Fetching ${target}...`, isSystem: true },
+        ])
+        fetch(target.startsWith('http') ? target : '/api/jatin')
+          .then((res) => res.json())
+          .then((data) => {
+            setHistory((prev) => [
+              ...prev,
+              { text: JSON.stringify(data, null, 2), isSystem: true },
+            ])
+          })
+          .catch(() => {
+            setHistory((prev) => [
+              ...prev,
+              { text: `curl: (7) Failed to connect to ${target}`, isSystem: true },
+            ])
+          })
+      } else if (base === 'neofetch') {
+        const info = [
+          '   /\          User: visitor@portfolio',
+          '  /  \         Host: portfolio-jade-six-34.vercel.app',
+          ' /\   \        OS: Linux / Vercel Edge Runtime',
+          '/      \       Stack: Next.js 16.2 / React 19 / Turbopack',
+          '|  /\  |       Languages: C++, TypeScript, Python, JS',
+          '| /  \ |       Focus: Low-Level Systems & Cloud/DevOps',
+          '|/    \|       Shell: portfolio-cli v2.0 (bash)',
+          '               Terminal Sound: Web Audio API Synthesized',
+        ].join('\n')
+        setHistory((prev) => [
+          ...prev,
+          { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
+          { text: info, isSystem: true },
+        ])
       } else if (base === 'sudo' && parts[1] === 'rm' && parts[2] === '-rf') {
         setHistory((prev) => [
           ...prev,
           { text: `visitor@portfolio:~$ ${cmd}`, isInput: true },
-          { text: '⛔ This is not the command you are looking for.', isSystem: true },
+          { text: '⛔ Nice try, but root access is protected.', isSystem: true },
         ])
       } else if (base in commands) {
         setHistory((prev) => [
@@ -375,10 +474,12 @@ export default function TerminalWidget({ onMatrixToggle }: Props) {
         ])
       }
     },
-    [setTheme, guessGame, setGuessGame, onMatrixToggle]
+    [setTheme, guessGame, setGuessGame, onMatrixToggle, commandHistory]
   )
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
+    playKeyClick()
+
     if (e.key === 'Enter') {
       handleCommand(input)
       setInput('')
@@ -484,6 +585,7 @@ export default function TerminalWidget({ onMatrixToggle }: Props) {
             type="button"
             onClick={(e) => {
               e.stopPropagation()
+              playKeyClick()
               handleCommand(cmd)
             }}
             className="rounded border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] font-mono text-[var(--green)] hover:border-[var(--green)]/50 hover:bg-[var(--green)]/10 transition-colors cursor-pointer"

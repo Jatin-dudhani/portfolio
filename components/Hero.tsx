@@ -145,6 +145,9 @@ export default function Hero({ onMatrixToggle }: HeroProps) {
 
         <motion.div variants={item} className="relative w-full max-w-lg mx-auto lg:mx-0">
           <TerminalWidget onMatrixToggle={onMatrixToggle} />
+          <p className="mt-2 text-center text-[10px] text-[var(--muted)] font-mono">
+            Tip: press <kbd className="rounded border border-[var(--card-border)] bg-[var(--card-bg)] px-1 py-0.5 text-[var(--green)] font-semibold">~</kbd> or <kbd className="rounded border border-[var(--card-border)] bg-[var(--card-bg)] px-1 py-0.5 text-[var(--green)] font-semibold">`</kbd> to jump to CLI
+          </p>
         </motion.div>
       </div>
     </motion.section>

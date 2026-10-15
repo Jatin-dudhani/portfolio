@@ -22,6 +22,11 @@ const typeLabel: Record<string, string> = {
 
 export default function Blog() {
   const [tab, setTab] = useState<'writing' | 'reading'>('writing')
+  const [statusFilter, setStatusFilter] = useState<'all' | 'reading' | 'planned' | 'finished'>('all')
+
+  const filteredReading = statusFilter === 'all'
+    ? reading
+    : reading.filter((item) => item.status === statusFilter)
 
   return (
     <motion.section
@@ -112,8 +117,26 @@ export default function Blog() {
         )}
 
         {tab === 'reading' && (
-          <div className="space-y-3">
-            {reading.map((item, i) => (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-[var(--muted)]">$ filter:</span>
+              {(['all', 'reading', 'planned', 'finished'] as const).map((status) => (
+                <button
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  className={`rounded px-2.5 py-1 text-[11px] transition-colors cursor-pointer ${
+                    statusFilter === status
+                      ? 'border border-[var(--green)]/40 bg-[var(--green)]/15 text-[var(--green)]'
+                      : 'border border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--muted)] hover:text-[var(--foreground)]'
+                  }`}
+                >
+                  {status}
+                </button>
+              ))}
+            </div>
+
+            <div className="space-y-3">
+              {filteredReading.map((item, i) => (
               <motion.div
                 key={`${item.title}-${i}`}
                 initial={{ opacity: 0, y: 12 }}
@@ -150,6 +173,10 @@ export default function Blog() {
                 </div>
               </motion.div>
             ))}
+            {filteredReading.length === 0 && (
+              <p className="text-xs text-[var(--muted)] py-4">[info] No items matching status: {statusFilter}</p>
+            )}
+            </div>
           </div>
         )}
       </div>

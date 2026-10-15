@@ -11,6 +11,16 @@ export default function Projects() {
   const y = useTransform(scrollY, [800, 2200], [0, -30])
   const [filter, setFilter] = useState('')
 
+  const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  const copyCli = (id: string, text: string) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedId(id)
+      import('@/lib/sound').then((s) => s.playSuccessBeep())
+      setTimeout(() => setCopiedId(null), 1800)
+    })
+  }
+
   const filtered = filter.trim()
     ? projects.filter((p) =>
         p.technologies.some((t) => t.toLowerCase().includes(filter.toLowerCase()))
@@ -70,25 +80,48 @@ export default function Projects() {
               whileHover={{ y: -3, transition: { duration: 0.15 } }}
               className="group flex h-full flex-col rounded border border-[var(--card-border)] bg-[var(--card-bg)] p-5 transition-shadow hover:border-[var(--green)]/50 hover:shadow-[0_0_24px_rgba(63,185,80,0.08)]"
             >
-              <div className="mb-3 flex items-center gap-3">
-                <motion.span
-                  className="grid size-8 place-items-center rounded border border-[var(--green)]/30 bg-[var(--green)]/8 text-xs font-bold text-[var(--green)]"
-                  whileHover={{ rotate: [0, -8, 8, -4, 0], transition: { duration: 0.3 } }}
-                >
-                  {String(index + 1).padStart(2, '0')}
-                </motion.span>
-                <span className="text-[10px] uppercase tracking-widest text-[var(--muted)]">
-                  ./project
-                </span>
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <motion.span
+                    className="grid size-8 place-items-center rounded border border-[var(--green)]/30 bg-[var(--green)]/8 text-xs font-bold text-[var(--green)]"
+                    whileHover={{ rotate: [0, -8, 8, -4, 0], transition: { duration: 0.3 } }}
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </motion.span>
+                  <span className="text-[10px] uppercase tracking-widest text-[var(--muted)]">
+                    ./project
+                  </span>
+                </div>
+                {project.deployed ? (
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--green)]/40 bg-[var(--green)]/10 px-2 py-0.5 text-[10px] font-semibold text-[var(--green)]">
+                    <span className="size-1.5 rounded-full bg-[var(--green)] animate-ping" />
+                    LIVE
+                  </span>
+                ) : project.technologies.includes('C++') ? (
+                  <span className="rounded-full border border-[var(--amber)]/40 bg-[var(--amber)]/10 px-2 py-0.5 text-[10px] font-semibold text-[var(--amber)]">
+                    SYSTEMS / C++
+                  </span>
+                ) : (
+                  <span className="rounded-full border border-[var(--card-border)] bg-white/5 px-2 py-0.5 text-[10px] text-[var(--muted)]">
+                    OPEN SOURCE
+                  </span>
+                )}
               </div>
 
               <h3 className="text-base font-bold text-[var(--foreground)]">{project.title}</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--muted)]">{project.description}</p>
 
               {project.preview && (
-                <div className="mt-4 rounded border border-[var(--card-border)] bg-[var(--background)]/40 p-2.5 font-mono text-[11px] leading-5 overflow-x-auto">
+                <div className="relative mt-4 rounded border border-[var(--card-border)] bg-[var(--background)]/40 p-2.5 font-mono text-[11px] leading-5 overflow-x-auto">
+                  <button
+                    onClick={() => copyCli(project.id, project.preview![0])}
+                    className="absolute top-2 right-2 rounded border border-[var(--card-border)] bg-[var(--card-bg)] px-1.5 py-0.5 text-[9px] text-[var(--muted)] hover:text-[var(--green)] hover:border-[var(--green)]/40 transition-colors cursor-pointer"
+                    title="Copy command"
+                  >
+                    {copiedId === project.id ? 'COPIED!' : 'COPY'}
+                  </button>
                   {project.preview.map((line, i) => (
-                    <div key={i} className={`whitespace-nowrap ${line.startsWith('$') ? 'text-[var(--foreground)]' : line.startsWith('[') && line.includes('OK]') ? 'text-[var(--green)]' : line.startsWith('[') && line.includes('ERR') ? 'text-[var(--red)]' : 'text-[var(--muted)]'}`}>
+                    <div key={i} className={`whitespace-nowrap ${line.startsWith('$') ? 'text-[var(--foreground)] pr-12' : line.startsWith('[') && line.includes('OK]') ? 'text-[var(--green)]' : line.startsWith('[') && line.includes('ERR') ? 'text-[var(--red)]' : 'text-[var(--muted)]'}`}>
                       {line}
                     </div>
                   ))}
@@ -122,7 +155,7 @@ export default function Projects() {
                     rel="noopener noreferrer"
                     className="flex-1 rounded border border-[var(--card-border)] px-3 py-2 text-center font-semibold text-[var(--muted)] transition-all duration-200 hover:border-[var(--amber)] hover:text-[var(--amber)] hover:shadow-[0_0_14px_rgba(210,153,34,0.15)]"
                   >
-                    curl -L {project.deployed.replace(/https?:\/\//, '')}
+                    $ open demo ↗
                   </a>
                 )}
               </div>

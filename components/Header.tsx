@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'motion/react'
 import ThemeToggle from './ThemeToggle'
@@ -36,6 +36,7 @@ export default function Header() {
             ))}
           </nav>
 
+          <SoundToggle />
           <ThemeToggle />
 
           <button
@@ -72,5 +73,69 @@ export default function Header() {
         )}
       </AnimatePresence>
     </header>
+  )
+}
+
+function subscribeSound(callback: () => void) {
+  window.addEventListener('terminal-sound-change', callback)
+  window.addEventListener('storage', callback)
+  return () => {
+    window.removeEventListener('terminal-sound-change', callback)
+    window.removeEventListener('storage', callback)
+  }
+}
+
+function getSoundSnapshot() {
+  try {
+    return localStorage.getItem('terminal_sound') === 'true'
+  } catch {
+    return false
+  }
+}
+
+const emptySubscribe = () => () => {}
+
+function SoundToggle() {
+  const mounted = useSyncExternalStore(emptySubscribe, () => true, () => false)
+  const enabled = useSyncExternalStore(subscribeSound, getSoundSnapshot, () => false)
+
+  if (!mounted) return <div className="size-9" />
+
+  const toggle = () => {
+    const next = !enabled
+    try {
+      localStorage.setItem('terminal_sound', next ? 'true' : 'false')
+      window.dispatchEvent(new Event('terminal-sound-change'))
+      if (next) {
+        import('@/lib/sound').then((s) => s.playSuccessBeep())
+      }
+    } catch {}
+  }
+
+  return (
+    <button
+      onClick={toggle}
+      className={`grid size-9 place-items-center rounded border transition-colors cursor-pointer ${
+        enabled
+          ? 'border-[var(--green)]/60 bg-[var(--green)]/10 text-[var(--green)]'
+          : 'border-[var(--card-border)] bg-[var(--card-bg)] text-[var(--muted)] hover:border-[var(--green)] hover:text-[var(--green)]'
+      }`}
+      aria-label={enabled ? 'Mute terminal sound' : 'Enable terminal sound'}
+      title={enabled ? 'Terminal sound: ON' : 'Terminal sound: OFF'}
+    >
+      {enabled ? (
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+          <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+        </svg>
+      ) : (
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+          <line x1="23" y1="9" x2="17" y2="15" />
+          <line x1="17" y1="9" x2="23" y2="15" />
+        </svg>
+      )}
+    </button>
   )
 }
