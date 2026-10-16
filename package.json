@@ -14,7 +14,7 @@
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "motion": "^12.40.0",
-    "next": "16.2.6",
+    "next": "^16.4.2",
     "next-themes": "^0.4.6",
     "plausible-tracker": "^0.3.9",
     "react": "19.2.4",
@@ -31,11 +31,13 @@
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.2",
     "eslint": "^9",
-    "eslint-config-next": "16.2.6",
+    "eslint-config-next": "^16.4.2",
     "jsdom": "^29.1.1",
-    "postcss-cli": "^11.0.1",
     "tailwindcss": "^4",
     "typescript": "^5",
-    "vitest": "^4.1.8"
+    "vitest": "^4.1.12"
+  },
+  "overrides": {
+    "braces": "npm:@franciscosolis/braces@^3.1.1"
   }
 }

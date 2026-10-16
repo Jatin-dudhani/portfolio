@@ -97,7 +97,7 @@ export async function POST(request: Request) {
     }
 
     if (!apiKey.startsWith('sk-or-v1-')) {
-      console.error('OPENROUTER_API_KEY has invalid format:', apiKey.slice(0, 15))
+      console.error('OPENROUTER_API_KEY has invalid format')
       return NextResponse.json({ reply: 'API key format is invalid.' }, { status: 500 })
     }
 
