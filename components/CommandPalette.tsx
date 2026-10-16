@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'motion/react'
 import { useTheme } from 'next-themes'
 import { playKeyClick, playSuccessBeep } from '@/lib/sound'
@@ -23,6 +24,7 @@ export default function CommandPalette({ onMatrixToggle, onOpenAIChat }: Command
   const [query, setQuery] = useState('')
   const [selectedIndex, setSelectedIndex] = useState(0)
   const { setTheme } = useTheme()
+  const router = useRouter()
   const inputRef = useRef<HTMLInputElement>(null)
 
   const scrollTo = (id: string) => {
@@ -128,7 +130,8 @@ export default function CommandPalette({ onMatrixToggle, onOpenAIChat }: Command
       category: 'Actions',
       shortcut: 'pdf',
       action: () => {
-        window.location.assign('/resume')
+        setIsOpen(false)
+        router.push('/resume')
       },
     },
 

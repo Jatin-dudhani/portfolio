@@ -7,6 +7,13 @@ const hits = new Map<string, { count: number; resetAt: number }>()
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now()
+  // Clean up expired entries periodically to prevent memory leaks
+  if (hits.size > 1000) {
+    for (const [key, value] of hits.entries()) {
+      if (now > value.resetAt) hits.delete(key)
+    }
+  }
+
   const entry = hits.get(ip)
   if (!entry || now > entry.resetAt) {
     hits.set(ip, { count: 1, resetAt: now + RATE_WINDOW })
@@ -15,6 +22,22 @@ function checkRateLimit(ip: string): boolean {
   if (entry.count >= RATE_LIMIT) return false
   entry.count++
   return true
+}
+
+function isOriginAllowed(origin: string): boolean {
+  if (!origin) return true // Allow same-origin / server-to-server calls
+  try {
+    const parsed = new URL(origin)
+    const hostname = parsed.hostname
+    if (hostname === 'localhost' || hostname === '127.0.0.1') return true
+    if (hostname === 'portfolio-jade-six-34.vercel.app') return true
+    if (hostname.endsWith('.vercel.app')) return true
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+    if (siteUrl && hostname === new URL(siteUrl).hostname) return true
+    return false
+  } catch {
+    return false
+  }
 }
 
 const SYSTEM_PROMPT = `You are a helpful assistant for Jatin Dudhani's portfolio website. Answer questions about Jatin's skills, experience, projects, and background. Be concise and technical.
@@ -50,47 +73,76 @@ async function tryModel(apiKey: string, message: string, model: string) {
     max_tokens: 300,
   })
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${apiKey}`,
-      'HTTP-Referer': 'https://portfolio-jade-six-34.vercel.app',
-    },
-    body,
-  })
+  try {
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+        'HTTP-Referer': 'https://portfolio-jade-six-34.vercel.app',
+      },
+      body,
+      signal: AbortSignal.timeout(8000), // 8s timeout to avoid worker hang
+    })
 
-  if (!res.ok) {
-    const errText = await res.text()
-    console.error(`OpenRouter error (${model}):`, res.status, errText)
+    if (!res.ok) {
+      return null
+    }
+    const data = await res.json()
+    return data.choices?.[0]?.message?.content || null
+  } catch {
     return null
   }
-  const data = await res.json()
-  return data.choices?.[0]?.message?.content || null
 }
 
 export async function POST(request: Request) {
+  // Origin validation
+  const origin = request.headers.get('origin') || request.headers.get('referer') || ''
+  if (!isOriginAllowed(origin)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+
+  // Rate limiting per IP
+  const ip =
+    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    request.headers.get('x-real-ip') ||
+    'anonymous'
+
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { reply: 'Rate limit exceeded. Try again in a minute.' },
+      { status: 429 }
+    )
+  }
+
   try {
-    const { message } = await request.json()
+    let payload: { message?: unknown }
+    try {
+      payload = await request.json()
+    } catch {
+      return NextResponse.json({ error: 'Invalid JSON payload' }, { status: 400 })
+    }
+
+    const { message } = payload
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 })
     }
 
-    const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      || request.headers.get('x-real-ip')
-      || 'anonymous'
+    const trimmed = message.trim()
+    if (!trimmed) {
+      return NextResponse.json({ error: 'Message cannot be empty' }, { status: 400 })
+    }
 
-    if (!checkRateLimit(ip)) {
+    if (trimmed.length > 600) {
       return NextResponse.json(
-        { reply: `Rate limit exceeded. Try again in a minute.` },
-        { status: 429 }
+        { error: 'Message is too long. Please limit to 600 characters.' },
+        { status: 400 }
       )
     }
 
     const apiKey = process.env.OPENROUTER_API_KEY
     if (!apiKey) {
-      console.error('OPENROUTER_API_KEY is not set')
       return NextResponse.json({
         reply: 'AI chat is not configured yet. Add OPENROUTER_API_KEY to your environment variables.',
       })
@@ -102,12 +154,15 @@ export async function POST(request: Request) {
     }
 
     for (const model of MODELS) {
-      const reply = await tryModel(apiKey, message, model)
+      const reply = await tryModel(apiKey, trimmed, model)
       if (reply) return NextResponse.json({ reply })
-      await new Promise((r) => setTimeout(r, 200))
+      await new Promise((r) => setTimeout(r, 150))
     }
 
-    return NextResponse.json({ reply: 'AI service temporarily unavailable. Try again later.' }, { status: 502 })
+    return NextResponse.json(
+      { reply: 'AI service temporarily unavailable. Try again in a moment.' },
+      { status: 502 }
+    )
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err)
     console.error('Chat API error:', msg)

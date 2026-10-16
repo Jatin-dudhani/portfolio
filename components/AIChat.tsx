@@ -35,7 +35,7 @@ export default function AIChat() {
         body: JSON.stringify({ message: msg }),
       })
       const data = await res.json()
-      setMessages((prev) => [...prev, { role: 'ai', text: data.reply }])
+      setMessages((prev) => [...prev, { role: 'ai', text: data.reply || data.error || 'No response.' }])
     } catch {
       setMessages((prev) => [...prev, { role: 'ai', text: 'Network error. Try again.' }])
     } finally {
@@ -132,6 +132,7 @@ export default function AIChat() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && send()}
+                maxLength={500}
                 placeholder="ask about jatin..."
                 className="flex-1 bg-transparent text-xs text-[var(--foreground)] outline-none placeholder:text-[var(--muted)]/50"
                 spellCheck={false}

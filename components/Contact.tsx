@@ -207,6 +207,7 @@ export default function Contact() {
                 value={formData.name}
                 onChange={handleChange}
                 required
+                maxLength={100}
                 className="mt-1 w-full rounded border border-[var(--card-border)] bg-[var(--background)]/50 px-3 py-2 text-sm text-[var(--foreground)] outline-none transition-all duration-150 placeholder:text-[var(--muted)]/40 font-mono focus:border-[var(--green)]/60 focus:shadow-[0_0_12px_rgba(63,185,80,0.08)]"
                 placeholder="your name"
               />
@@ -223,6 +224,7 @@ export default function Contact() {
                 value={formData.email}
                 onChange={handleChange}
                 required
+                maxLength={254}
                 className="mt-1 w-full rounded border border-[var(--card-border)] bg-[var(--background)]/50 px-3 py-2 text-sm text-[var(--foreground)] outline-none transition-all duration-150 placeholder:text-[var(--muted)]/40 font-mono focus:border-[var(--green)]/60 focus:shadow-[0_0_12px_rgba(63,185,80,0.08)]"
                 placeholder="you@example.com"
               />
@@ -239,6 +241,7 @@ export default function Contact() {
               value={formData.message}
               onChange={handleChange}
               required
+              maxLength={5000}
               rows={4}
               className="mt-1 w-full resize-none rounded border border-[var(--card-border)] bg-[var(--background)]/50 px-3 py-2 text-sm text-[var(--foreground)] outline-none transition-all duration-150 placeholder:text-[var(--muted)]/40 font-mono focus:border-[var(--green)]/60 focus:shadow-[0_0_12px_rgba(63,185,80,0.08)]"
               placeholder="your message..."
