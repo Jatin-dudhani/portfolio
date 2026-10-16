@@ -95,4 +95,18 @@ export const projects: Project[] = [
       '[OK] https://devops.jatin.dev',
     ],
   },
+  {
+    id: 'bulk-email-sender',
+    title: 'Bulk Email Sender',
+    description: 'A full-stack bulk email distribution engine with queue management, automated CI/CD pipelines, and secure delivery integration.',
+    technologies: ['Node.js', 'Express', 'Firebase', 'CI/CD', 'GitHub Actions'],
+    github: 'https://github.com/Jatin-dudhani/Bulk-Email-Sender',
+    preview: [
+      '$ npm run start',
+      '[Server] Listening on port 5000',
+      '[Firebase] App Hosting initialized',
+      '[Queue] Dispatching batch campaign...',
+      '[OK] 250/250 messages delivered',
+    ],
+  },
 ]

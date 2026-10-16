@@ -27,25 +27,19 @@ export default function GitHubActivity() {
   useEffect(() => {
     const controller = new AbortController()
 
-    fetch('https://api.github.com/users/Jatin-dudhani/events/public', {
+    fetch('/api/github', {
       signal: controller.signal,
     })
       .then((res) => {
         if (!res.ok) throw new Error('fetch failed')
         return res.json()
       })
-      .then((data: { type: string; repo: { name: string }; payload: { commits?: { message: string }[] }; created_at: string; id: string }[]) => {
-        const parsed: GHPost[] = data
-          .filter((e) => e.type === 'PushEvent' && e.payload.commits?.length)
-          .slice(0, 6)
-          .map((e) => ({
-            id: e.id,
-            repo: e.repo.name,
-            message: e.payload.commits![0].message.split('\n')[0],
-            date: e.created_at,
-            url: `https://github.com/${e.repo.name}`,
-          }))
-        setEvents(parsed.length ? parsed : FALLBACK)
+      .then((data: { activity?: GHPost[] }) => {
+        if (data.activity && data.activity.length) {
+          setEvents(data.activity)
+        } else {
+          setEvents(FALLBACK)
+        }
         setLoading(false)
       })
       .catch(() => {
@@ -76,7 +70,13 @@ export default function GitHubActivity() {
           <p className="text-sm text-[var(--green)]">
             $ <span className="text-[var(--muted)]">curl</span> -s api.github.com/users/Jatin-dudhani/events
           </p>
-          <h2 className="mt-2 text-2xl font-bold text-[var(--foreground)]"># Recent Activity</h2>
+          <h2 className="mt-2 text-2xl font-bold text-[var(--foreground)] flex items-center gap-3">
+            # Recent Activity
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--green)]/30 bg-[var(--green)]/10 px-2 py-0.5 text-[10px] font-normal text-[var(--green)]">
+              <span className="size-1.5 rounded-full bg-[var(--green)] animate-pulse" />
+              Live Sync
+            </span>
+          </h2>
         </motion.div>
 
         {loading ? (
