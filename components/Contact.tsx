@@ -16,6 +16,8 @@ export default function Contact() {
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -26,6 +28,8 @@ export default function Contact() {
     e.preventDefault()
     setIsSubmitting(true)
     setSubmitStatus('idle')
+    setErrorMessage(null)
+    setNotice(null)
 
     try {
       const res = await fetch('/api/contact', {
@@ -34,12 +38,26 @@ export default function Contact() {
         body: JSON.stringify(formData),
       })
 
-      if (!res.ok) throw new Error('Failed to send')
+      const data = await res.json().catch(() => null)
+
+      if (!res.ok) {
+        const errorText =
+          data?.details?.message?.[0] ||
+          data?.details?.email?.[0] ||
+          data?.details?.name?.[0] ||
+          data?.error ||
+          'Failed to send message'
+        throw new Error(errorText)
+      }
 
       setSubmitStatus('success')
+      if (data?.note) {
+        setNotice(data.note)
+      }
       setFormData({ name: '', email: '', message: '', website: '' })
-    } catch {
+    } catch (err) {
       setSubmitStatus('error')
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to send message.')
     } finally {
       setIsSubmitting(false)
     }
@@ -238,22 +256,36 @@ export default function Contact() {
           </motion.button>
 
           {submitStatus === 'success' && (
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-3 text-center text-xs text-[var(--green)]"
+              className="mt-3 rounded border border-[var(--green)]/30 bg-[var(--green)]/10 p-3 text-center text-xs text-[var(--green)]"
             >
-              [OK] Message sent. I will get back to you soon.
-            </motion.p>
+              <p>[OK] Message received! Thanks for reaching out.</p>
+              {notice && (
+                <p className="mt-1 text-[11px] text-[var(--muted)]">
+                  {notice}
+                </p>
+              )}
+            </motion.div>
           )}
+
           {submitStatus === 'error' && (
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 6 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-3 text-center text-xs text-[var(--red)]"
+              className="mt-3 rounded border border-[var(--red)]/30 bg-[var(--red)]/10 p-3 text-center text-xs text-[var(--red)]"
             >
-              [ERR] Failed to send. Try emailing directly.
-            </motion.p>
+              <p>[ERR] {errorMessage || 'Failed to send. Try emailing directly.'}</p>
+              <a
+                href={`mailto:${contactEmail}?subject=Message via Portfolio&body=${encodeURIComponent(
+                  formData.message ? `${formData.message}\n\n— ${formData.name || 'Visitor'} (${formData.email || ''})` : ''
+                )}`}
+                className="mt-2 inline-block rounded border border-[var(--red)]/40 px-3 py-1 text-[11px] font-semibold text-[var(--foreground)] hover:bg-[var(--red)]/20 transition-colors"
+              >
+                $ open email client directly ↗
+              </a>
+            </motion.div>
           )}
         </motion.form>
       </div>

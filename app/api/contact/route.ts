@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 import { z } from 'zod'
 
 const bodySchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  message: z.string().min(10, 'Message must be at least 10 characters'),
+  name: z.string().trim().min(1, 'Please enter your name'),
+  email: z.string().trim().email('Please enter a valid email address'),
+  message: z.string().trim().min(2, 'Message must be at least 2 characters'),
   website: z.string().optional(), // Honeypot field for bot protection
 })
 
