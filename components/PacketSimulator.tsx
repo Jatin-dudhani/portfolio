@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'motion/react'
+import { useState, useRef, useEffect, useCallback } from 'react'
+import { motion } from 'motion/react'
 import { playKeyClick, playSuccessBeep } from '@/lib/sound'
 
 type PacketPreset = {
@@ -16,6 +16,12 @@ type PacketPreset = {
   ruleApplied: string
   hexSnippet: string
   details: string
+}
+
+type LogEntry = {
+  id: number
+  text: string
+  type: 'ingest' | 'parser' | 'classifier' | 'verdict' | 'default'
 }
 
 const PRESETS: PacketPreset[] = [
@@ -79,40 +85,82 @@ export default function PacketSimulator() {
   const [isSimulating, setIsSimulating] = useState(false)
   const [activeTab, setActiveTab] = useState<'simulator' | 'architecture'>('simulator')
   const [stats, setStats] = useState({ total: 142, forwarded: 124, dropped: 18 })
-  const [log, setLog] = useState<string[]>([
-    '[DPI Engine C++17] Multi-threaded worker pool online (4 threads)',
-    '[RuleEngine] Loaded 25 application classifiers + 14 security rules',
-    'Ready. Select a packet profile and click "Inject Packet".',
+
+  const logCounterRef = useRef(100)
+  const [log, setLog] = useState<LogEntry[]>([
+    {
+      id: 1,
+      text: '[DPI Engine C++17] Multi-threaded worker pool online (4 threads)',
+      type: 'default',
+    },
+    {
+      id: 2,
+      text: '[RuleEngine] Loaded 25 application classifiers + 14 security rules',
+      type: 'default',
+    },
+    {
+      id: 3,
+      text: 'Ready. Select a packet profile and click "Inject Packet".',
+      type: 'default',
+    },
   ])
+
+  const timersRef = useRef<NodeJS.Timeout[]>([])
+
+  const clearPendingTimers = useCallback(() => {
+    timersRef.current.forEach((t) => clearTimeout(t))
+    timersRef.current = []
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      clearPendingTimers()
+    }
+  }, [clearPendingTimers])
+
+  const appendLog = useCallback((text: string, type: LogEntry['type']) => {
+    logCounterRef.current += 1
+    const newEntry: LogEntry = {
+      id: logCounterRef.current,
+      text,
+      type,
+    }
+    setLog((prev) => [newEntry, ...prev.slice(0, 14)])
+  }, [])
 
   const runSimulation = (preset: PacketPreset) => {
     if (isSimulating) return
-    playKeyClick()
+
+    try {
+      playKeyClick()
+    } catch {}
+
+    clearPendingTimers()
     setIsSimulating(true)
     setStage(1)
 
-    setLog((prev) => [
+    appendLog(
       `[INGEST] Packet received from ${preset.src} → ${preset.dst} (${preset.protocol})`,
-      ...prev.slice(0, 7),
-    ])
+      'ingest'
+    )
 
-    setTimeout(() => {
+    const t1 = setTimeout(() => {
       setStage(2)
-      setLog((prev) => [
+      appendLog(
         `[PARSER] Unpacked Ethernet/IP/${preset.protocol}. Discovered identifier: "${preset.sniOrHost}"`,
-        ...prev,
-      ])
-    }, 450)
+        'parser'
+      )
+    }, 400)
 
-    setTimeout(() => {
+    const t2 = setTimeout(() => {
       setStage(3)
-      setLog((prev) => [
+      appendLog(
         `[CLASSIFIER] Matched signature: ${preset.classification}`,
-        ...prev,
-      ])
-    }, 900)
+        'classifier'
+      )
+    }, 800)
 
-    setTimeout(() => {
+    const t3 = setTimeout(() => {
       setStage(4)
       const isDrop = preset.verdict === 'DROP'
       setStats((s) => ({
@@ -121,18 +169,30 @@ export default function PacketSimulator() {
         dropped: isDrop ? s.dropped + 1 : s.dropped,
       }))
 
-      setLog((prev) => [
-        `[VERDICT] ${preset.verdict} — ${preset.ruleApplied}`,
-        ...prev,
-      ])
+      appendLog(`[VERDICT] ${preset.verdict} — ${preset.ruleApplied}`, 'verdict')
 
-      if (isDrop) {
-        playKeyClick()
-      } else {
-        playSuccessBeep()
-      }
+      try {
+        if (isDrop) {
+          playKeyClick()
+        } else {
+          playSuccessBeep()
+        }
+      } catch {}
+
       setIsSimulating(false)
-    }, 1350)
+    }, 1200)
+
+    timersRef.current = [t1, t2, t3]
+  }
+
+  const handleSelectPreset = (p: PacketPreset) => {
+    try {
+      playKeyClick()
+    } catch {}
+    clearPendingTimers()
+    setIsSimulating(false)
+    setSelected(p)
+    setStage(0)
   }
 
   return (
@@ -161,8 +221,9 @@ export default function PacketSimulator() {
             </p>
             <div className="flex items-center gap-1.5 shrink-0">
               <button
+                type="button"
                 onClick={() => {
-                  playKeyClick()
+                  try { playKeyClick() } catch {}
                   setActiveTab('simulator')
                 }}
                 className={`px-3 py-1 text-xs rounded border transition-colors cursor-pointer ${
@@ -174,8 +235,9 @@ export default function PacketSimulator() {
                 $ flow-inspector
               </button>
               <button
+                type="button"
                 onClick={() => {
-                  playKeyClick()
+                  try { playKeyClick() } catch {}
                   setActiveTab('architecture')
                 }}
                 className={`px-3 py-1 text-xs rounded border transition-colors cursor-pointer ${
@@ -263,11 +325,8 @@ export default function PacketSimulator() {
                   {PRESETS.map((p) => (
                     <button
                       key={p.id}
-                      onClick={() => {
-                        playKeyClick()
-                        setSelected(p)
-                        setStage(0)
-                      }}
+                      type="button"
+                      onClick={() => handleSelectPreset(p)}
                       className={`text-left rounded border p-2.5 transition-all duration-150 cursor-pointer ${
                         selected.id === p.id
                           ? 'border-[var(--green)] bg-[var(--green)]/10 text-[var(--foreground)]'
@@ -298,6 +357,7 @@ export default function PacketSimulator() {
                     Target: <span className="text-[var(--green)]">{selected.sniOrHost}</span>
                   </div>
                   <button
+                    type="button"
                     onClick={() => runSimulation(selected)}
                     disabled={isSimulating}
                     className="rounded border border-[var(--green)] bg-[var(--green)] px-4 py-2 text-xs font-bold text-[var(--background)] transition-all duration-200 hover:shadow-[0_0_18px_rgba(63,185,80,0.4)] disabled:opacity-50 cursor-pointer"
@@ -324,15 +384,12 @@ export default function PacketSimulator() {
                     const isDone = stage >= stepNum
 
                     return (
-                      <motion.div
+                      <div
                         key={step.num}
-                        animate={{
-                          scale: isCurrent ? 1.05 : 1,
-                        }}
-                        className={`rounded border p-2 flex flex-col items-center justify-center transition-colors ${
+                        className={`rounded border p-2 flex flex-col items-center justify-center transition-all ${
                           isDone
                             ? isCurrent
-                              ? 'border-[var(--green)] bg-[var(--green)]/15 text-[var(--green)] shadow-[0_0_12px_rgba(63,185,80,0.2)]'
+                              ? 'border-[var(--green)] bg-[var(--green)]/15 text-[var(--green)] shadow-[0_0_12px_rgba(63,185,80,0.2)] scale-105'
                               : 'border-[var(--green)]/40 bg-[var(--green)]/5 text-[var(--green)]'
                             : 'border-[var(--card-border)] bg-[var(--background)]/30 text-[var(--muted)]'
                         }`}
@@ -340,7 +397,7 @@ export default function PacketSimulator() {
                         <span className="text-[10px] font-bold opacity-60">{step.num}</span>
                         <span className="text-[11px] font-bold mt-0.5 truncate w-full">{step.title}</span>
                         <span className="text-[9px] text-[var(--muted)] mt-0.5">{step.desc}</span>
-                      </motion.div>
+                      </div>
                     )
                   })}
                 </div>
@@ -368,6 +425,7 @@ export default function PacketSimulator() {
                   <span className="ml-2 text-xs text-[var(--muted)]">dpi-worker-log.stdout</span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => setLog([])}
                   className="text-[10px] text-[var(--muted)] hover:text-[var(--foreground)] transition-colors cursor-pointer"
                 >
@@ -376,28 +434,27 @@ export default function PacketSimulator() {
               </div>
 
               <div className="flex-1 space-y-2 overflow-y-auto text-xs leading-5">
-                <AnimatePresence initial={false}>
-                  {log.map((item, i) => (
-                    <motion.div
-                      key={`${item}-${i}`}
-                      initial={{ opacity: 0, x: -6 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      className={`font-mono ${
-                        item.includes('[VERDICT] DROP')
-                          ? 'text-[var(--red)] font-semibold'
-                          : item.includes('[VERDICT] FORWARD')
-                          ? 'text-[var(--green)] font-semibold'
-                          : item.includes('[PARSER]')
-                          ? 'text-[var(--amber)]'
-                          : item.includes('[CLASSIFIER]')
-                          ? 'text-[var(--green-bright)]'
-                          : 'text-[var(--muted)]'
-                      }`}
-                    >
-                      {item}
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
+                {log.map((item) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, x: -6 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className={`font-mono ${
+                      item.type === 'verdict' && item.text.includes('DROP')
+                        ? 'text-[var(--red)] font-semibold'
+                        : item.type === 'verdict' && item.text.includes('FORWARD')
+                        ? 'text-[var(--green)] font-semibold'
+                        : item.type === 'parser'
+                        ? 'text-[var(--amber)]'
+                        : item.type === 'classifier'
+                        ? 'text-[var(--green-bright)]'
+                        : 'text-[var(--muted)]'
+                    }`}
+                  >
+                    {item.text}
+                  </motion.div>
+                ))}
               </div>
 
               <div className="mt-4 pt-3 border-t border-[var(--card-border)] text-[11px] text-[var(--muted)] flex items-center justify-between">

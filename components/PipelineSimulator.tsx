@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { playKeyClick, playSuccessBeep } from '@/lib/sound'
 
 type Stage = {
@@ -81,16 +81,34 @@ export default function PipelineSimulator() {
     'Ready. Click "Trigger Pipeline" to simulate end-to-end cloud build & deploy.',
   ])
 
+  const timersRef = useRef<NodeJS.Timeout[]>([])
+
+  const clearPendingTimers = useCallback(() => {
+    timersRef.current.forEach((t) => clearTimeout(t))
+    timersRef.current = []
+  }, [])
+
+  useEffect(() => {
+    return () => {
+      clearPendingTimers()
+    }
+  }, [clearPendingTimers])
+
   const triggerPipeline = () => {
     if (isRunning) return
-    playKeyClick()
+
+    try {
+      playKeyClick()
+    } catch {}
+
+    clearPendingTimers()
     setIsRunning(true)
     setCompletedStages([])
     setActiveStage(0)
     setActiveLogs([`[0.00s] Pipeline triggered by commit ${Math.random().toString(16).slice(2, 8)} (ref: master)`])
 
     STAGES.forEach((stage, idx) => {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         setActiveStage(idx)
         setActiveLogs((prev) => [
           `[STAGE ${idx + 1}/5] Running: $ ${stage.command}`,
@@ -100,14 +118,18 @@ export default function PipelineSimulator() {
         ])
         setCompletedStages((comp) => [...comp, idx])
 
-        if (idx === STAGES.length - 1) {
-          setIsRunning(false)
-          setActiveStage(-1)
-          playSuccessBeep()
-        } else {
-          playKeyClick()
-        }
+        try {
+          if (idx === STAGES.length - 1) {
+            setIsRunning(false)
+            setActiveStage(-1)
+            playSuccessBeep()
+          } else {
+            playKeyClick()
+          }
+        } catch {}
       }, (idx + 1) * 900)
+
+      timersRef.current.push(timer)
     })
   }
 
@@ -126,6 +148,7 @@ export default function PipelineSimulator() {
           </div>
 
           <button
+            type="button"
             onClick={triggerPipeline}
             disabled={isRunning}
             className="rounded border border-[var(--amber)] bg-[var(--amber)]/10 px-4 py-2.5 text-xs font-bold text-[var(--amber)] hover:bg-[var(--amber)] hover:text-[var(--background)] transition-all duration-200 hover:shadow-[0_0_18px_rgba(210,153,34,0.3)] disabled:opacity-50 cursor-pointer self-start sm:self-auto shrink-0"

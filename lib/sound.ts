@@ -4,31 +4,46 @@ let audioCtx: AudioContext | null = null
 
 function getAudioContext(): AudioContext | null {
   if (typeof window === 'undefined') return null
-  if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
-    if (AudioContextClass) {
-      audioCtx = new AudioContextClass()
+  try {
+    if (!audioCtx) {
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+      if (AudioContextClass) {
+        audioCtx = new AudioContextClass()
+      }
     }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume().catch(() => {})
+    }
+    return audioCtx
+  } catch {
+    return null
   }
-  if (audioCtx && audioCtx.state === 'suspended') {
-    audioCtx.resume().catch(() => {})
-  }
-  return audioCtx
 }
 
 export function isSoundEnabled(): boolean {
   if (typeof window === 'undefined') return false
-  return localStorage.getItem('terminal_sound') === 'true'
+  try {
+    if (typeof localStorage === 'undefined' || !localStorage) return false
+    return localStorage.getItem('terminal_sound') === 'true'
+  } catch {
+    return false
+  }
 }
 
 export function setSoundEnabled(enabled: boolean): void {
   if (typeof window === 'undefined') return
-  localStorage.setItem('terminal_sound', enabled ? 'true' : 'false')
+  try {
+    if (typeof localStorage !== 'undefined' && localStorage) {
+      localStorage.setItem('terminal_sound', enabled ? 'true' : 'false')
+    }
+  } catch {}
 }
 
 export function playKeyClick(): void {
-  if (!isSoundEnabled()) return
   try {
+    if (!isSoundEnabled()) return
     const ctx = getAudioContext()
     if (!ctx) return
     const osc = ctx.createOscillator()
@@ -47,13 +62,13 @@ export function playKeyClick(): void {
     osc.start()
     osc.stop(ctx.currentTime + 0.03)
   } catch {
-    // Audio context may be restricted by autoplay policy
+    // Audio context may be restricted by autoplay policy or unsupported
   }
 }
 
 export function playSuccessBeep(): void {
-  if (!isSoundEnabled()) return
   try {
+    if (!isSoundEnabled()) return
     const ctx = getAudioContext()
     if (!ctx) return
     const osc = ctx.createOscillator()
@@ -73,6 +88,6 @@ export function playSuccessBeep(): void {
     osc.start()
     osc.stop(ctx.currentTime + 0.22)
   } catch {
-    // Ignore autoplay restriction
+    // Ignore autoplay restriction or audio context errors
   }
 }
